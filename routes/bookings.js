@@ -1,17 +1,13 @@
-const express = require('express');
+﻿const express = require('express');
 const { db } = require('../db/init');
 const { requireUser } = require('../middleware/auth');
 
 const router = express.Router();
 
-const CHECKIN_GRACE_MIN = 15;   // minutes after slot start before an unclaimed booking auto-releases
+const CHECKIN_GRACE_MIN = 15;
 const MIN_DURATION_MIN = 15;
 const MAX_DURATION_MIN = 180;
 
-// Any booking whose 15-minute grace window has passed without a check-in
-// gets marked 'expired', freeing the slot for anyone else. Called at the
-// top of every booking route so it's always up to date - no separate
-// background job needed.
 function expireStaleBookings() {
   db.prepare(`
     UPDATE bookings SET status = 'expired'
@@ -24,8 +20,6 @@ function getUserStation(userId) {
   return db.prepare('SELECT * FROM stations WHERE user_id = ? ORDER BY id LIMIT 1').get(userId);
 }
 
-// List all non-cancelled/expired bookings for a station within a date range,
-// used both to show availability and to check for overlaps.
 function activeBookingsForStation(stationId) {
   return db.prepare(
     `SELECT * FROM bookings WHERE station_id = ? AND status IN ('booked','active')
@@ -33,13 +27,10 @@ function activeBookingsForStation(stationId) {
   ).all(stationId);
 }
 
-// GET /api/bookings/availability?stationId=1&date=2026-09-06
-// Returns existing booked/active slots for that station+date, so the
-// frontend can grey out taken times.
 router.get('/bookings/availability', requireUser, (req, res) => {
   expireStaleBookings();
   const stationId = Number(req.query.stationId);
-  const date = req.query.date; // 'YYYY-MM-DD'
+  const date = req.query.date;
   if (!stationId || !date) return res.status(400).json({ error: 'stationId and date are required' });
 
   const rows = db.prepare(
@@ -49,7 +40,6 @@ router.get('/bookings/availability', requireUser, (req, res) => {
   res.json({ taken: rows });
 });
 
-// POST /api/bookings  { stationId, slotStart, durationMin }
 router.post('/bookings', requireUser, (req, res) => {
   expireStaleBookings();
   const { stationId, slotStart, durationMin } = req.body || {};
@@ -85,7 +75,6 @@ router.post('/bookings', requireUser, (req, res) => {
   res.json({ id: info.lastInsertRowid, slotStart: start.toISOString(), slotEnd: end.toISOString() });
 });
 
-// GET /api/bookings - the logged-in user's own bookings (upcoming + recent)
 router.get('/bookings', requireUser, (req, res) => {
   expireStaleBookings();
   const rows = db.prepare(
@@ -96,8 +85,6 @@ router.get('/bookings', requireUser, (req, res) => {
   res.json({ bookings: rows, checkinGraceMin: CHECKIN_GRACE_MIN });
 });
 
-// POST /api/bookings/:id/checkin - consumer confirms they've arrived and are using the slot.
-// Only allowed from slot_start up to the grace-period cutoff.
 router.post('/bookings/:id/checkin', requireUser, (req, res) => {
   expireStaleBookings();
   const booking = db.prepare('SELECT * FROM bookings WHERE id = ? AND user_id = ?').get(req.params.id, req.userId);
@@ -118,7 +105,6 @@ router.post('/bookings/:id/checkin', requireUser, (req, res) => {
   res.json({ ok: true });
 });
 
-// POST /api/bookings/:id/cancel
 router.post('/bookings/:id/cancel', requireUser, (req, res) => {
   const booking = db.prepare('SELECT * FROM bookings WHERE id = ? AND user_id = ?').get(req.params.id, req.userId);
   if (!booking) return res.status(404).json({ error: 'booking not found' });
@@ -127,6 +113,31 @@ router.post('/bookings/:id/cancel', requireUser, (req, res) => {
   }
   db.prepare("UPDATE bookings SET status='cancelled' WHERE id = ?").run(booking.id);
   res.json({ ok: true });
+});
+
+router.get('/bookings/owner', requireUser, (req, res) => {
+  expireStaleBookings();
+  const rows = db.prepare(
+    `SELECT b.*, s.name as station_name, u.name as booker_name, u.email as booker_email
+     FROM bookings b
+     JOIN stations s ON s.id = b.station_id
+     JOIN users u ON u.id = b.user_id
+     WHERE s.user_id = ?
+     ORDER BY b.slot_start DESC LIMIT 100`
+  ).all(req.userId);
+  res.json({ bookings: rows, checkinGraceMin: CHECKIN_GRACE_MIN });
+});
+
+router.get('/stations/:id/public', requireUser, (req, res) => {
+  const station = db.prepare('SELECT id, name FROM stations WHERE id = ?').get(req.params.id);
+  if (!station) return res.status(404).json({ error: 'station not found' });
+  res.json({ station });
+});
+
+router.get('/stations/main', requireUser, (req, res) => {
+  const station = db.prepare('SELECT id, name FROM stations ORDER BY id LIMIT 1').get();
+  if (!station) return res.status(404).json({ error: 'no station exists yet' });
+  res.json({ station });
 });
 
 module.exports = router;

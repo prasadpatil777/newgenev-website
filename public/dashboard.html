@@ -1,10 +1,39 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard - NEW GEN EV</title>
 <link rel="stylesheet" href="/style.css">
+<style>
+.hero{
+  background: radial-gradient(120% 160% at 0% 0%, rgba(255,181,71,.10), transparent 55%),
+              linear-gradient(160deg, var(--panel-2), var(--panel));
+  border:1px solid var(--line); border-radius:16px; padding:26px 28px; margin-top:22px;
+  display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+}
+.hero-left{display:flex; align-items:center; gap:16px}
+.pulse-dot{width:12px;height:12px;border-radius:50%;background:var(--teal);position:relative;flex-shrink:0}
+.pulse-dot.off{background:var(--red)}
+.pulse-dot::after{
+  content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--teal);
+  animation:pulse 1.8s ease-out infinite;
+}
+.pulse-dot.off::after{border-color:var(--red); animation:none}
+@keyframes pulse{0%{transform:scale(0.6);opacity:1}100%{transform:scale(1.8);opacity:0}}
+.hero-state{font-size:28px;font-weight:800;font-family:var(--font-num);letter-spacing:.3px}
+.hero-sub{color:var(--muted);font-size:13px;margin-top:3px}
+.hero-right{display:flex;gap:28px;text-align:right}
+.hero-metric .lbl{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.hero-metric .num{font-family:var(--font-num);font-size:22px;font-weight:700;color:var(--amber)}
+
+.icon{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:1.8;vertical-align:-4px;margin-right:6px}
+.card .lbl{display:flex;align-items:center}
+
+.chartcard{margin-top:16px}
+.chartcard canvas{width:100%;height:140px;display:block}
+.chart-empty{color:var(--muted);font-size:13px;text-align:center;padding:40px 0}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -19,35 +48,49 @@
     <button class="logout" onclick="Auth.logout()">Log out</button>
   </div>
 
-  <div class="status-row">
-    <span class="pill offline" id="onlinePill">Checking...</span>
-    <span class="state-big" id="stateBig">-</span>
+  <div class="hero">
+    <div class="hero-left">
+      <span class="pulse-dot off" id="statusDot"></span>
+      <div>
+        <div class="hero-state" id="stateBig">-</div>
+        <div class="hero-sub" id="stationName">Loading station…</div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-metric">
+        <div class="lbl">Session bill</div>
+        <div class="num" id="bill">₹0.00</div>
+      </div>
+      <div class="hero-metric">
+        <div class="lbl">Units used</div>
+        <div class="num" id="units">0.000</div>
+      </div>
+      <div class="hero-metric">
+        <div class="lbl">Time</div>
+        <div class="num" id="time">0:00</div>
+      </div>
+    </div>
   </div>
 
-  <div class="billrow">
-    <div class="billcard amber">
-      <div class="lbl">Current session bill</div>
-      <div class="big" id="bill">₹0.00</div>
-    </div>
-    <div class="billcard teal">
-      <div class="lbl">Units this session</div>
-      <div class="big" id="units">0.000 <small style="font-size:14px">kWh</small></div>
-    </div>
+  <div class="grid" style="margin-top:16px">
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke-linejoin="round"/></svg>Voltage</div><div class="val" id="v">0.0<small>V</small></div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>Current</div><div class="val" id="i">0.000<small>A</small></div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Power</div><div class="val" id="p">0.0<small>W</small></div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 16 0"/><path d="M12 12 16 8"/></svg>Power factor</div><div class="val" id="pf">0.00</div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12h3l2-8 4 16 2-8h7"/></svg>Frequency</div><div class="val" id="hz">0.0<small>Hz</small></div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v14M8 8l4-4 4 4"/><path d="M5 22h14"/></svg>Total energy</div><div class="val" id="kwh">0.000<small>kWh</small></div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v7.5a4 4 0 1 0 6 0V6a3 3 0 0 0-3-3Z"/></svg>Temperature</div><div class="val" id="temp">0.0<small>°C</small></div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M6 19V9a6 6 0 0 1 12 0v10M3 19h18"/></svg>Relay</div><div class="val" id="relay">OFF</div></div>
   </div>
 
-  <div class="grid">
-    <div class="card"><div class="lbl">Voltage</div><div class="val" id="v">0.0<small>V</small></div></div>
-    <div class="card"><div class="lbl">Current</div><div class="val" id="i">0.000<small>A</small></div></div>
-    <div class="card"><div class="lbl">Power</div><div class="val" id="p">0.0<small>W</small></div></div>
-    <div class="card"><div class="lbl">Power factor</div><div class="val" id="pf">0.00</div></div>
-    <div class="card"><div class="lbl">Frequency</div><div class="val" id="hz">0.0<small>Hz</small></div></div>
-    <div class="card"><div class="lbl">Total energy</div><div class="val" id="kwh">0.000<small>kWh</small></div></div>
-    <div class="card"><div class="lbl">Temperature</div><div class="val" id="temp">0.0<small>°C</small></div></div>
-    <div class="card"><div class="lbl">Session time</div><div class="val" id="time">0:00</div></div>
+  <div class="card chartcard">
+    <div class="lbl" style="margin-bottom:10px"><svg class="icon" viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 8-9"/></svg>Power over recent readings</div>
+    <canvas id="chart" width="900" height="140"></canvas>
+    <div class="chart-empty" id="chartEmpty" style="display:none">No data yet — waiting for the station.</div>
   </div>
 
   <div class="section-title">Your station's API key</div>
-  <p class="hint">Put this in your Arduino/ESP32 code so it can send data here. Keep it private.</p>
+  <p class="hint">Put this in your ESP32 code so it can send data here. Keep it private.</p>
   <div class="card" style="margin-top:8px"><code id="apiKey">loading...</code></div>
 </div>
 
@@ -65,16 +108,56 @@ function fmtTime(sec){
 async function loadKey(){
   try{
     const data = await api('/auth/me');
-    if(data.stations && data.stations[0]) document.getElementById('apiKey').textContent = data.stations[0].api_key;
+    if(data.stations && data.stations[0]){
+      document.getElementById('apiKey').textContent = data.stations[0].api_key;
+      document.getElementById('stationName').textContent = data.stations[0].name;
+    }
   }catch(e){}
+}
+
+function drawChart(points){
+  const canvas = document.getElementById('chart');
+  const empty = document.getElementById('chartEmpty');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+
+  if(!points || points.length < 2){
+    empty.style.display = 'block';
+    canvas.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  canvas.style.display = 'block';
+
+  const values = points.map(p => p.power);
+  const max = Math.max(...values, 1);
+  const min = Math.min(...values, 0);
+  const range = (max - min) || 1;
+  const stepX = w / (values.length - 1);
+
+  ctx.beginPath();
+  values.forEach((v, idx) => {
+    const x = idx * stepX;
+    const y = h - ((v - min) / range) * (h - 20) - 10;
+    if(idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = '#ffb547';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,181,71,0.08)';
+  ctx.fill();
 }
 
 async function refresh(){
   try{
     const data = await api('/live');
-    const pill = document.getElementById('onlinePill');
-    pill.textContent = data.online ? 'Online' : 'Offline';
-    pill.className = 'pill ' + (data.online ? 'online' : 'offline');
+    const dot = document.getElementById('statusDot');
+    dot.className = 'pulse-dot' + (data.online ? '' : ' off');
 
     const t = data.latest;
     document.getElementById('stateBig').textContent = t ? t.state : 'NO DATA YET';
@@ -85,12 +168,22 @@ async function refresh(){
     document.getElementById('hz').innerHTML = (t? t.hz.toFixed(2):'0.00') + '<small>Hz</small>';
     document.getElementById('kwh').innerHTML = (t? t.kwh.toFixed(3):'0.000') + '<small>kWh</small>';
     document.getElementById('temp').innerHTML = (t? t.temp.toFixed(1):'0.0') + '<small>°C</small>';
+    document.getElementById('relay').textContent = (t && t.relay) ? 'ON' : 'OFF';
     document.getElementById('time').textContent = fmtTime(t? t.time_sec:0);
 
     const sessionKwh = t ? (t.session_wh/1000) : 0;
-    const rate = 20; // ₹ per unit - keep in sync with your ESP32/backend rate
-    document.getElementById('units').innerHTML = sessionKwh.toFixed(3) + ' <small style="font-size:14px">kWh</small>';
+    const rate = 20;
+    document.getElementById('units').textContent = sessionKwh.toFixed(3);
     document.getElementById('bill').textContent = '₹' + (sessionKwh*rate).toFixed(2);
+  }catch(e){
+    console.error(e);
+  }
+}
+
+async function refreshChart(){
+  try{
+    const data = await api('/live/history');
+    drawChart(data.points);
   }catch(e){
     console.error(e);
   }
@@ -98,7 +191,9 @@ async function refresh(){
 
 loadKey();
 refresh();
+refreshChart();
 setInterval(refresh, 2000);
+setInterval(refreshChart, 4000);
 </script>
 </body>
 </html>
