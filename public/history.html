@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History - NEW GEN EV</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
+    <div class="navlinks">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/history.html" class="active">History</a>
+      <a href="/booking.html">Book a slot</a>
+      <span id="userChip" style="color:var(--text)"></span>
+    </div>
+    <button class="logout" onclick="Auth.logout()">Log out</button>
+  </div>
+
+  <div class="billrow">
+    <div class="billcard amber">
+      <div class="lbl">Total sessions</div>
+      <div class="big" id="totalCount">0</div>
+    </div>
+    <div class="billcard teal">
+      <div class="lbl">Total revenue</div>
+      <div class="big" id="totalBill">₹0.00</div>
+    </div>
+  </div>
+
+  <div class="section-title">Past sessions</div>
+  <div class="card" style="padding:6px 16px">
+    <table>
+      <thead><tr><th>Date &amp; time</th><th>Duration</th><th>Units</th><th>Bill</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg" style="display:none">No completed sessions yet.</div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+<script>
+Auth.requireAuth();
+paintUserChip();
+
+function fmtDur(sec){
+  sec = Math.max(0, Math.floor(sec||0));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  return (h? h+'h ':'') + String(m).padStart(2,'0') + 'm ' + String(s).padStart(2,'0') + 's';
+}
+
+async function load(){
+  try{
+    const data = await api('/sessions');
+    document.getElementById('totalCount').textContent = data.totals.count;
+    document.getElementById('totalBill').textContent = '₹' + Number(data.totals.bill).toFixed(2);
+
+    const rows = document.getElementById('rows');
+    if(!data.sessions.length){
+      document.getElementById('emptyMsg').style.display = 'block';
+      return;
+    }
+    rows.innerHTML = data.sessions.map(s => `
+      <tr>
+        <td>${new Date(s.ended_at + 'Z').toLocaleString()}</td>
+        <td>${fmtDur(s.duration_sec)}</td>
+        <td>${Number(s.units).toFixed(3)} kWh</td>
+        <td>₹${Number(s.bill).toFixed(2)}</td>
+      </tr>`).join('');
+  }catch(e){
+    console.error(e);
+  }
+}
+load();
+</script>
+</body>
+</html>

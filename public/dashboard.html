@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard - NEW GEN EV</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
+    <div class="navlinks">
+      <a href="/dashboard.html" class="active">Dashboard</a>
+      <a href="/history.html">History</a>
+      <a href="/booking.html">Book a slot</a>
+      <span id="userChip" style="color:var(--text)"></span>
+    </div>
+    <button class="logout" onclick="Auth.logout()">Log out</button>
+  </div>
+
+  <div class="status-row">
+    <span class="pill offline" id="onlinePill">Checking...</span>
+    <span class="state-big" id="stateBig">-</span>
+  </div>
+
+  <div class="billrow">
+    <div class="billcard amber">
+      <div class="lbl">Current session bill</div>
+      <div class="big" id="bill">₹0.00</div>
+    </div>
+    <div class="billcard teal">
+      <div class="lbl">Units this session</div>
+      <div class="big" id="units">0.000 <small style="font-size:14px">kWh</small></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="lbl">Voltage</div><div class="val" id="v">0.0<small>V</small></div></div>
+    <div class="card"><div class="lbl">Current</div><div class="val" id="i">0.000<small>A</small></div></div>
+    <div class="card"><div class="lbl">Power</div><div class="val" id="p">0.0<small>W</small></div></div>
+    <div class="card"><div class="lbl">Power factor</div><div class="val" id="pf">0.00</div></div>
+    <div class="card"><div class="lbl">Frequency</div><div class="val" id="hz">0.0<small>Hz</small></div></div>
+    <div class="card"><div class="lbl">Total energy</div><div class="val" id="kwh">0.000<small>kWh</small></div></div>
+    <div class="card"><div class="lbl">Temperature</div><div class="val" id="temp">0.0<small>°C</small></div></div>
+    <div class="card"><div class="lbl">Session time</div><div class="val" id="time">0:00</div></div>
+  </div>
+
+  <div class="section-title">Your station's API key</div>
+  <p class="hint">Put this in your Arduino/ESP32 code so it can send data here. Keep it private.</p>
+  <div class="card" style="margin-top:8px"><code id="apiKey">loading...</code></div>
+</div>
+
+<script src="/app.js"></script>
+<script>
+Auth.requireAuth();
+paintUserChip();
+
+function fmtTime(sec){
+  sec = Math.max(0, Math.floor(sec||0));
+  const m = Math.floor(sec/60), s = sec%60;
+  return m + ':' + String(s).padStart(2,'0');
+}
+
+async function loadKey(){
+  try{
+    const data = await api('/auth/me');
+    if(data.stations && data.stations[0]) document.getElementById('apiKey').textContent = data.stations[0].api_key;
+  }catch(e){}
+}
+
+async function refresh(){
+  try{
+    const data = await api('/live');
+    const pill = document.getElementById('onlinePill');
+    pill.textContent = data.online ? 'Online' : 'Offline';
+    pill.className = 'pill ' + (data.online ? 'online' : 'offline');
+
+    const t = data.latest;
+    document.getElementById('stateBig').textContent = t ? t.state : 'NO DATA YET';
+    document.getElementById('v').innerHTML = (t? t.voltage.toFixed(1):'0.0') + '<small>V</small>';
+    document.getElementById('i').innerHTML = (t? t.current.toFixed(3):'0.000') + '<small>A</small>';
+    document.getElementById('p').innerHTML = (t? t.power.toFixed(1):'0.0') + '<small>W</small>';
+    document.getElementById('pf').textContent = t? t.pf.toFixed(3):'0.000';
+    document.getElementById('hz').innerHTML = (t? t.hz.toFixed(2):'0.00') + '<small>Hz</small>';
+    document.getElementById('kwh').innerHTML = (t? t.kwh.toFixed(3):'0.000') + '<small>kWh</small>';
+    document.getElementById('temp').innerHTML = (t? t.temp.toFixed(1):'0.0') + '<small>°C</small>';
+    document.getElementById('time').textContent = fmtTime(t? t.time_sec:0);
+
+    const sessionKwh = t ? (t.session_wh/1000) : 0;
+    const rate = 20; // ₹ per unit - keep in sync with your ESP32/backend rate
+    document.getElementById('units').innerHTML = sessionKwh.toFixed(3) + ' <small style="font-size:14px">kWh</small>';
+    document.getElementById('bill').textContent = '₹' + (sessionKwh*rate).toFixed(2);
+  }catch(e){
+    console.error(e);
+  }
+}
+
+loadKey();
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>

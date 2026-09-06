@@ -1,0 +1,89 @@
+:root{
+  --bg:#12161a;
+  --panel:#1a2025;
+  --panel-2:#20272d;
+  --line:#2a3238;
+  --text:#e7edf1;
+  --muted:#8a97a1;
+  --amber:#ffb547;
+  --teal:#33d9b2;
+  --red:#ff6161;
+  --font-ui: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-num: "SF Mono", "Cascadia Code", Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-ui);
+  min-height:100vh;
+}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+/* ---- Top bar ---- */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 0;border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.2px}
+.brand .bolt{
+  width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,var(--amber),#ff8a3d);color:#241300;font-size:15px;
+}
+.navlinks{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+.navlinks a{text-decoration:none;padding-bottom:3px;border-bottom:2px solid transparent}
+.navlinks a.active{color:var(--text);border-color:var(--amber)}
+.logout{background:none;border:1px solid var(--line);color:var(--muted);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:13px}
+.logout:hover{color:var(--text);border-color:var(--muted)}
+
+/* ---- Auth pages ---- */
+.authshell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.authcard{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:32px}
+.authcard h1{font-size:20px;margin:0 0 4px}
+.authcard p.sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px}
+input{
+  width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);font-size:14px;font-family:var(--font-ui);
+}
+input:focus{outline:none;border-color:var(--amber)}
+.btn{
+  width:100%;margin-top:22px;padding:12px;border-radius:8px;border:none;cursor:pointer;
+  background:var(--amber);color:#241300;font-weight:700;font-size:14.5px;
+}
+.btn:hover{filter:brightness(1.06)}
+.switchline{text-align:center;margin-top:18px;font-size:13.5px;color:var(--muted)}
+.err{background:#2a1414;border:1px solid #5c2626;color:#ffb3b3;padding:9px 12px;border-radius:7px;font-size:13px;margin-top:14px;display:none}
+
+/* ---- Dashboard ---- */
+.status-row{display:flex;align-items:center;gap:10px;margin:24px 0 20px}
+.pill{padding:5px 13px;border-radius:20px;font-size:12.5px;font-weight:600;letter-spacing:.2px}
+.pill.online{background:rgba(51,217,178,.14);color:var(--teal)}
+.pill.offline{background:rgba(255,97,97,.14);color:var(--red)}
+.state-big{font-size:26px;font-weight:700;font-family:var(--font-num)}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:780px){.grid{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card .lbl{font-size:12px;color:var(--muted);margin-bottom:8px}
+.card .val{font-family:var(--font-num);font-size:22px;font-weight:600}
+.card .val small{font-size:12px;color:var(--muted);font-weight:400;margin-left:3px}
+
+.billrow{display:flex;gap:12px;margin:20px 0}
+.billcard{flex:1;background:linear-gradient(160deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:12px;padding:20px}
+.billcard .lbl{color:var(--muted);font-size:13px}
+.billcard .big{font-family:var(--font-num);font-size:32px;font-weight:700;margin-top:6px}
+.billcard.amber .big{color:var(--amber)}
+.billcard.teal .big{color:var(--teal)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:12.5px;padding:10px 8px;border-bottom:1px solid var(--line)}
+td{padding:11px 8px;border-bottom:1px solid var(--line);font-family:var(--font-num)}
+tr:last-child td{border-bottom:none}
+.empty{color:var(--muted);text-align:center;padding:30px 0;font-size:14px}
+
+.section-title{font-size:15px;font-weight:700;margin:28px 0 10px}
+.hint{color:var(--muted);font-size:13px;margin-top:6px}
+code{background:var(--panel-2);padding:2px 6px;border-radius:5px;font-family:var(--font-num);font-size:12.5px}

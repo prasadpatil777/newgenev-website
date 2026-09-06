@@ -1,0 +1,6 @@
+node_modules/
+.env
+ev.db
+ev.db-shm
+ev.db-wal
+server.log
