@@ -1,9 +1,4 @@
-// SQLite database setup using Node's built-in node:sqlite module — no
-// native compilation needed (works on any machine with a recent Node.js,
-// no Python or Visual Studio build tools required). Creates ev.db in the
-// project root on first run.
-
-const { DatabaseSync } = require('node:sqlite');
+﻿const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -52,7 +47,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   user_id INTEGER NOT NULL REFERENCES users(id),
   slot_start TEXT NOT NULL,
   slot_end TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'booked',  -- booked | active | expired | cancelled | completed
+  status TEXT NOT NULL DEFAULT 'booked',
+  seen INTEGER NOT NULL DEFAULT 0,
   created_at TEXT DEFAULT (datetime('now'))
 );
 
@@ -62,6 +58,16 @@ CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(user_id, slot_start);
 CREATE INDEX IF NOT EXISTS idx_telemetry_station ON telemetry(station_id, received_at);
 CREATE INDEX IF NOT EXISTS idx_sessions_station ON sessions(station_id, ended_at);
 `);
+
+try {
+  const cols = db.prepare("PRAGMA table_info(bookings)").all();
+  const hasSeen = cols.some(c => c.name === 'seen');
+  if (!hasSeen) {
+    db.exec('ALTER TABLE bookings ADD COLUMN seen INTEGER NOT NULL DEFAULT 0');
+  }
+} catch (e) {
+  console.error('bookings.seen migration check failed:', e.message);
+}
 
 function newApiKey() {
   return 'ev_' + crypto.randomBytes(16).toString('hex');

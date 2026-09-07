@@ -1,4 +1,4 @@
-const Auth = {
+﻿const Auth = {
   getToken(){ return localStorage.getItem('ev_token'); },
   setSession(token, user){
     localStorage.setItem('ev_token', token);
@@ -35,3 +35,29 @@ function paintUserChip(){
   const u = Auth.getUser();
   if(el && u) el.textContent = u.name;
 }
+
+async function initBookingBadge(){
+  if(!Auth.getToken()) return;
+  const link = document.querySelector('a[href="/booking.html"]');
+  if(!link) return;
+
+  let badge = document.createElement('span');
+  badge.style.cssText = 'display:inline-block;min-width:16px;height:16px;padding:0 4px;margin-left:5px;border-radius:8px;background:#ff6161;color:#fff;font-size:10px;line-height:16px;text-align:center;font-weight:700;vertical-align:2px;';
+  badge.style.display = 'none';
+  link.appendChild(badge);
+
+  async function poll(){
+    try{
+      const data = await api('/bookings/owner/unread-count');
+      if(data.count > 0){
+        badge.textContent = data.count;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    }catch(e){ }
+  }
+  poll();
+  setInterval(poll, 15000);
+}
+initBookingBadge();

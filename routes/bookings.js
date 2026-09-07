@@ -125,17 +125,44 @@ router.get('/bookings/owner', requireUser, (req, res) => {
      WHERE s.user_id = ?
      ORDER BY b.slot_start DESC LIMIT 100`
   ).all(req.userId);
+
+  db.prepare(
+    `UPDATE bookings SET seen = 1 WHERE station_id IN (SELECT id FROM stations WHERE user_id = ?)`
+  ).run(req.userId);
+
   res.json({ bookings: rows, checkinGraceMin: CHECKIN_GRACE_MIN });
 });
 
+router.get('/bookings/owner/stats', requireUser, (req, res) => {
+  const row = db.prepare(
+    `SELECT COUNT(*) as totalBookings, COUNT(DISTINCT user_id) as uniqueCustomers
+     FROM bookings WHERE station_id IN (SELECT id FROM stations WHERE user_id = ?)`
+  ).get(req.userId);
+  res.json(row);
+});
+router.get('/bookings/owner/unread-count', requireUser, (req, res) => {
+  expireStaleBookings();
+  const row = db.prepare(
+    `SELECT COUNT(*) as count FROM bookings
+     WHERE seen = 0 AND station_id IN (SELECT id FROM stations WHERE user_id = ?)`
+  ).get(req.userId);
+  res.json({ count: row.count });
+});
+
 router.get('/stations/:id/public', requireUser, (req, res) => {
-  const station = db.prepare('SELECT id, name FROM stations WHERE id = ?').get(req.params.id);
+  const station = db.prepare(
+    `SELECT s.id, s.name, u.email as owner_email FROM stations s
+     JOIN users u ON u.id = s.user_id WHERE s.id = ?`
+  ).get(req.params.id);
   if (!station) return res.status(404).json({ error: 'station not found' });
   res.json({ station });
 });
 
 router.get('/stations/main', requireUser, (req, res) => {
-  const station = db.prepare('SELECT id, name FROM stations ORDER BY id LIMIT 1').get();
+  const station = db.prepare(
+    `SELECT s.id, s.name, u.email as owner_email FROM stations s
+     JOIN users u ON u.id = s.user_id ORDER BY s.id LIMIT 1`
+  ).get();
   if (!station) return res.status(404).json({ error: 'no station exists yet' });
   res.json({ station });
 });
