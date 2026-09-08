@@ -1,12 +1,12 @@
-const express = require('express');
+﻿const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { db, newApiKey } = require('../db/init');
+const { pool, newApiKey } = require('../db/init');
 const { JWT_SECRET, requireUser } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { name, email, password, stationName } = req.body || {};
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'name, email and password are required' });
@@ -15,28 +15,32 @@ router.post('/register', (req, res) => {
     return res.status(400).json({ error: 'password must be at least 6 characters' });
   }
 
-  const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
-  if (existing) return res.status(409).json({ error: 'an account with this email already exists' });
+  const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email.toLowerCase()]);
+  if (existing.rows.length) return res.status(409).json({ error: 'an account with this email already exists' });
 
   const hash = bcrypt.hashSync(password, 10);
-  const info = db.prepare('INSERT INTO users (name, email, password_hash) VALUES (?,?,?)')
-    .run(name, email.toLowerCase(), hash);
-  const userId = info.lastInsertRowid;
+  const userResult = await pool.query(
+    'INSERT INTO users (name, email, password_hash) VALUES ($1,$2,$3) RETURNING id',
+    [name, email.toLowerCase(), hash]
+  );
+  const userId = userResult.rows[0].id;
 
-  // Every new user gets one station by default, with its own API key for the ESP32.
   const apiKey = newApiKey();
-  db.prepare('INSERT INTO stations (user_id, name, api_key) VALUES (?,?,?)')
-    .run(userId, stationName || 'My EV Charger', apiKey);
+  await pool.query(
+    'INSERT INTO stations (user_id, name, api_key) VALUES ($1,$2,$3)',
+    [userId, stationName || 'My EV Charger', apiKey]
+  );
 
   const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
   res.json({ token, user: { id: userId, name, email }, stationApiKey: apiKey });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ error: 'email and password are required' });
 
-  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email.toLowerCase()]);
+  const user = result.rows[0];
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'invalid email or password' });
   }
@@ -45,10 +49,11 @@ router.post('/login', (req, res) => {
   res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
 });
 
-router.get('/me', requireUser, (req, res) => {
-  const user = db.prepare('SELECT id, name, email, created_at FROM users WHERE id = ?').get(req.userId);
-  const stations = db.prepare('SELECT id, name, api_key, created_at FROM stations WHERE user_id = ?').all(req.userId);
-  res.json({ user, stations });
+router.get('/me', requireUser, async (req, res) => {
+  const userResult = await pool.query('SELECT id, name, email, created_at FROM users WHERE id = $1', [req.userId]);
+  const stationsResult = await pool.query('SELECT id, name, api_key, created_at FROM stations WHERE user_id = $1', [req.userId]);
+  res.json({ user: userResult.rows[0], stations: stationsResult.rows });
 });
 
 module.exports = router;
+
