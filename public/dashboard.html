@@ -33,6 +33,14 @@
 .chartcard{margin-top:16px}
 .chartcard canvas{width:100%;height:140px;display:block}
 .chart-empty{color:var(--muted);font-size:13px;text-align:center;padding:40px 0}
+
+.emg-banner{
+  display:none; align-items:center; gap:10px; background:rgba(255,97,97,.14); border:1px solid var(--red);
+  color:var(--red); font-weight:700; padding:12px 18px; border-radius:10px; margin-top:16px;
+}
+.emg-banner.show{display:flex}
+.emg-dot{width:10px;height:10px;border-radius:50%;background:var(--red);animation:blink 1s step-start infinite}
+@keyframes blink{50%{opacity:0}}
 </style>
 </head>
 <body>
@@ -71,6 +79,8 @@
       </div>
     </div>
   </div>
+
+  <div class="emg-banner" id="emgBanner"><span class="emg-dot"></span> EMERGENCY STOP ACTIVE — charging halted</div>
 
   <div class="grid" style="margin-top:16px">
     <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke-linejoin="round"/></svg>Voltage</div><div class="val" id="v">0.0<small>V</small></div></div>
@@ -171,6 +181,9 @@ async function refresh(){
     document.getElementById('relay').textContent = (t && t.relay) ? 'ON' : 'OFF';
     document.getElementById('time').textContent = fmtTime(t? t.time_sec:0);
 
+    const emgBanner = document.getElementById('emgBanner');
+    emgBanner.classList.toggle('show', !!(t && t.emergency));
+
     const sessionKwh = t ? (t.session_wh/1000) : 0;
     const rate = 20;
     document.getElementById('units').textContent = sessionKwh.toFixed(3);
@@ -192,8 +205,9 @@ async function refreshChart(){
 loadKey();
 refresh();
 refreshChart();
-setInterval(refresh, 2000);
-setInterval(refreshChart, 4000);
+setInterval(refresh, 1000);
+setInterval(refreshChart, 3000);
 </script>
 </body>
 </html>
+
