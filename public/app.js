@@ -36,6 +36,9 @@ function paintUserChip(){
   if(el && u) el.textContent = u.name;
 }
 
+// Shows a small red badge with an unread count next to the "Book a slot"
+// nav link, on every page that has that link, if the logged-in user owns
+// a station with unseen bookings. No per-page markup needed.
 async function initBookingBadge(){
   if(!Auth.getToken()) return;
   const link = document.querySelector('a[href="/booking.html"]');
@@ -55,9 +58,28 @@ async function initBookingBadge(){
       } else {
         badge.style.display = 'none';
       }
-    }catch(e){ }
+    }catch(e){ /* not a station owner, or not logged in yet - ignore */ }
   }
   poll();
   setInterval(poll, 15000);
 }
 initBookingBadge();
+
+// Adds an "About" nav link (team + contact info) to every page's navbar
+// that doesn't already have one, so we don't need to edit each page.
+function initAboutLink(){
+  const nav = document.querySelector('.navlinks');
+  if(!nav) return;
+  if(nav.querySelector('a[href="/about.html"]')) return;
+
+  const link = document.createElement('a');
+  link.href = '/about.html';
+  link.textContent = 'About';
+  if(location.pathname === '/about.html') link.className = 'active';
+
+  const userChip = document.getElementById('userChip');
+  if(userChip) nav.insertBefore(link, userChip);
+  else nav.appendChild(link);
+}
+initAboutLink();
+

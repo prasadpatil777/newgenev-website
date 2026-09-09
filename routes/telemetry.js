@@ -54,7 +54,7 @@ router.get('/live', requireUser, async (req, res) => {
 
   const latestResult = await pool.query('SELECT * FROM telemetry WHERE station_id = $1 ORDER BY id DESC LIMIT 1', [station.id]);
   const latest = latestResult.rows[0];
-  const isOnline = latest && (Date.now() - new Date(latest.received_at).getTime()) < 5000;
+  const isOnline = latest && (Date.now() - new Date(latest.received_at).getTime()) < 3000;
 
   res.json({ station: { id: station.id, name: station.name }, online: !!isOnline, latest: latest || null });
 });
