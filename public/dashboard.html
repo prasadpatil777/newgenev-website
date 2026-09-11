@@ -46,7 +46,7 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="bolt">âš¡</div>NEW GEN EV</div>
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
     <div class="navlinks">
       <a href="/dashboard.html" class="active">Dashboard</a>
       <a href="/history.html">History</a>
@@ -61,13 +61,13 @@
       <span class="pulse-dot off" id="statusDot"></span>
       <div>
         <div class="hero-state" id="stateBig">-</div>
-        <div class="hero-sub" id="stationName">Loading stationâ€¦</div>
+        <div class="hero-sub" id="stationName">Loading station…</div>
       </div>
     </div>
     <div class="hero-right">
       <div class="hero-metric">
         <div class="lbl">Session bill</div>
-        <div class="num" id="bill">â‚¹0.00</div>
+        <div class="num" id="bill">₹0.00</div>
       </div>
       <div class="hero-metric">
         <div class="lbl">Units used</div>
@@ -80,7 +80,7 @@
     </div>
   </div>
 
-  <div class="emg-banner" id="emgBanner"><span class="emg-dot"></span> EMERGENCY STOP ACTIVE â€” charging halted</div>
+  <div class="emg-banner" id="emgBanner"><span class="emg-dot"></span> EMERGENCY STOP ACTIVE — charging halted</div>
 
   <div class="grid" style="margin-top:16px">
     <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke-linejoin="round"/></svg>Voltage</div><div class="val" id="v">0.0<small>V</small></div></div>
@@ -89,14 +89,14 @@
     <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 16 0"/><path d="M12 12 16 8"/></svg>Power factor</div><div class="val" id="pf">0.00</div></div>
     <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M3 12h3l2-8 4 16 2-8h7"/></svg>Frequency</div><div class="val" id="hz">0.0<small>Hz</small></div></div>
     <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2v14M8 8l4-4 4 4"/><path d="M5 22h14"/></svg>Total energy</div><div class="val" id="kwh">0.000<small>kWh</small></div></div>
-    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v7.5a4 4 0 1 0 6 0V6a3 3 0 0 0-3-3Z"/></svg>Temperature</div><div class="val" id="temp">0.0<small>Â°C</small></div></div>
+    <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v7.5a4 4 0 1 0 6 0V6a3 3 0 0 0-3-3Z"/></svg>Temperature</div><div class="val" id="temp">0.0<small>°C</small></div></div>
     <div class="card"><div class="lbl"><svg class="icon" viewBox="0 0 24 24"><path d="M6 19V9a6 6 0 0 1 12 0v10M3 19h18"/></svg>Relay</div><div class="val" id="relay">OFF</div></div>
   </div>
 
   <div class="card chartcard">
     <div class="lbl" style="margin-bottom:10px"><svg class="icon" viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 8-9"/></svg>Power over recent readings</div>
     <canvas id="chart" width="900" height="140"></canvas>
-    <div class="chart-empty" id="chartEmpty" style="display:none">No data yet â€” waiting for the station.</div>
+    <div class="chart-empty" id="chartEmpty" style="display:none">No data yet — waiting for the station.</div>
   </div>
 
   <div class="section-title">Your station's API key</div>
@@ -169,7 +169,7 @@ async function refresh(){
     const dot = document.getElementById('statusDot');
     dot.className = 'pulse-dot' + (data.online ? '' : ' off');
 
-    const t = data.latest;
+    const t = data.online ? data.latest : null;
     document.getElementById('stateBig').textContent = !data.online ? 'OFFLINE' : (t ? t.state : 'NO DATA YET');
     document.getElementById('v').innerHTML = (t? t.voltage.toFixed(1):'0.0') + '<small>V</small>';
     document.getElementById('i').innerHTML = (t? t.current.toFixed(3):'0.000') + '<small>A</small>';
@@ -177,7 +177,7 @@ async function refresh(){
     document.getElementById('pf').textContent = t? t.pf.toFixed(3):'0.000';
     document.getElementById('hz').innerHTML = (t? t.hz.toFixed(2):'0.00') + '<small>Hz</small>';
     document.getElementById('kwh').innerHTML = (t? t.kwh.toFixed(3):'0.000') + '<small>kWh</small>';
-    document.getElementById('temp').innerHTML = (t? t.temp.toFixed(1):'0.0') + '<small>Â°C</small>';
+    document.getElementById('temp').innerHTML = (t? t.temp.toFixed(1):'0.0') + '<small>°C</small>';
     document.getElementById('relay').textContent = (t && t.relay) ? 'ON' : 'OFF';
     document.getElementById('time').textContent = fmtTime(t? t.time_sec:0);
 
@@ -187,7 +187,7 @@ async function refresh(){
     const sessionKwh = t ? (t.session_wh/1000) : 0;
     const rate = 20;
     document.getElementById('units').textContent = sessionKwh.toFixed(3);
-    document.getElementById('bill').textContent = 'â‚¹' + (sessionKwh*rate).toFixed(2);
+    document.getElementById('bill').textContent = '₹' + (sessionKwh*rate).toFixed(2);
   }catch(e){
     console.error(e);
   }
