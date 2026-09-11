@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Goals - NEW GEN EV</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.goalgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:14px}
+@media(max-width:700px){.goalgrid{grid-template-columns:1fr}}
+.goalcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.goalicon{
+  width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,var(--amber),#ff8a3d);margin-bottom:14px;font-size:20px;
+}
+.goalcard h3{margin:0 0 8px;font-size:15.5px}
+.goalcard p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.6}
+.missionband{
+  background: linear-gradient(160deg, var(--panel-2), var(--panel));
+  border:1px solid var(--line); border-radius:16px; padding:28px 30px; margin-top:24px; text-align:center;
+}
+.missionband p{max-width:600px;margin:10px auto 0;color:var(--muted);font-size:14px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
+    <div class="navlinks">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/history.html">History</a>
+      <a href="/booking.html">Book a slot</a>
+      <a href="/goals.html" class="active">Goals</a>
+      <span id="userChip" style="color:var(--text)"></span>
+    </div>
+    <button class="logout" onclick="Auth.logout()">Log out</button>
+  </div>
+
+  <div class="missionband">
+    <div style="color:var(--amber);font-weight:800;font-size:22px">Our Mission</div>
+    <p>To make EV charging simple, transparent and accessible — a smart, RFID-based station that any EV owner can book, use and pay for in real time, backed by data every step of the way.</p>
+  </div>
+
+  <div class="section-title">What we're working toward</div>
+  <div class="goalgrid">
+    <div class="goalcard">
+      <div class="goalicon">⚡</div>
+      <h3>Reliable, real-time charging</h3>
+      <p>Live voltage, current, power and energy readings straight from the meter — no guesswork, no waiting to find out what happened during a session.</p>
+    </div>
+    <div class="goalcard">
+      <div class="goalicon">📅</div>
+      <h3>Zero-hassle booking</h3>
+      <p>Reserve a slot in advance, and if you don't show up within 15 minutes, it's released automatically — fair access for everyone, no manual coordination needed.</p>
+    </div>
+    <div class="goalcard">
+      <div class="goalicon">🔒</div>
+      <h3>Safety first</h3>
+      <p>Emergency-stop monitoring, relay protection, and an always-on dashboard mean the station can be watched and controlled from anywhere.</p>
+    </div>
+    <div class="goalcard">
+      <div class="goalicon">🌱</div>
+      <h3>Supporting cleaner mobility</h3>
+      <p>Every session tracked here is a step toward making EV adoption easier — reliable infrastructure is one of the biggest barriers to going electric, and that's what we're building.</p>
+    </div>
+    <div class="goalcard">
+      <div class="goalicon">📊</div>
+      <h3>Transparent billing</h3>
+      <p>Bills are calculated directly from real energy consumed (not estimates), so every user sees exactly what they used and what they owe.</p>
+    </div>
+    <div class="goalcard">
+      <div class="goalicon">🚀</div>
+      <h3>Built to grow</h3>
+      <p>From a single station today to a network tomorrow — the same dashboard, booking system and app are designed to scale to more chargers and more locations.</p>
+    </div>
+  </div>
+
+  <div style="height:40px"></div>
+</div>
+<script src="/app.js"></script>
+<script>Auth.requireAuth(); paintUserChip();</script>
+</body>
+</html>
