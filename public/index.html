@@ -1,7 +1,133 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>NEW GEN EV</title></head>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEW GEN EV - Smart Real-Time EV Charging</title>
+<meta name="description" content="A real-time, RFID-based smart EV charging station with live monitoring, slot booking and transparent billing.">
+<link rel="stylesheet" href="/style.css">
+<style>
+.landtop{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.landbtns{display:flex;gap:10px}
+.landbtns a{padding:9px 18px;border-radius:8px;text-decoration:none;font-size:13.5px;font-weight:700}
+.landbtns .ghost{border:1px solid var(--line);color:var(--text)}
+.landbtns .solid{background:var(--amber);color:#241300}
+
+.hero2{display:flex;align-items:center;gap:40px;padding:50px 0 30px;flex-wrap:wrap}
+.hero2-text{flex:1;min-width:300px}
+.hero2-text h1{font-size:38px;line-height:1.2;margin:0 0 16px}
+.hero2-text h1 span{color:var(--amber)}
+.hero2-text p{color:var(--muted);font-size:15px;line-height:1.7;max-width:460px;margin:0 0 26px}
+.hero2-cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero2-cta a{padding:13px 26px;border-radius:9px;text-decoration:none;font-weight:700;font-size:14.5px}
+.hero2-cta .primary{background:var(--amber);color:#241300}
+.hero2-cta .secondary{border:1px solid var(--line);color:var(--text)}
+.hero2-art{flex:1;min-width:280px;display:flex;justify-content:center}
+.hero2-art svg{width:100%;max-width:420px;height:auto}
+
+.featgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+@media(max-width:900px){.featgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.featgrid{grid-template-columns:1fr}}
+.featcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.featicon{width:40px;height:40px;border-radius:10px;background:linear-gradient(150deg,var(--amber),#ff8a3d);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.featcard h3{margin:0 0 6px;font-size:14.5px}
+.featcard p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.6}
+
+.ctaband{
+  background:linear-gradient(160deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:16px;
+  padding:36px;text-align:center;margin-top:40px;
+}
+.ctaband h2{margin:0 0 10px;font-size:22px}
+.ctaband p{color:var(--muted);margin:0 0 20px;font-size:14px}
+
+.landfoot{display:flex;justify-content:space-between;align-items:center;padding:28px 0;color:var(--muted);font-size:12.5px;flex-wrap:wrap;gap:10px}
+.landfoot a{color:var(--muted);text-decoration:none;margin-left:16px}
+.landfoot a:hover{color:var(--text)}
+</style>
+</head>
 <body>
+<div class="wrap">
+  <div class="landtop">
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
+    <div class="landbtns" id="topBtns">
+      <a href="/login.html" class="ghost">Sign in</a>
+      <a href="/register.html" class="solid">Get started</a>
+    </div>
+  </div>
+
+  <div class="hero2">
+    <div class="hero2-text">
+      <h1>Smart, real-time <span>EV charging</span>, built for you</h1>
+      <p>Live voltage, current and power straight from the meter. Book your slot in advance. Pay for exactly what you use — all from one dashboard.</p>
+      <div class="hero2-cta">
+        <a href="/register.html" class="primary">Create free account</a>
+        <a href="/goals.html" class="secondary">Learn more</a>
+      </div>
+    </div>
+    <div class="hero2-art">
+      <svg viewBox="0 0 480 480" role="img" aria-label="EV charging illustration">
+        <defs>
+          <radialGradient id="lglow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffb547" stop-opacity="0.30"/>
+            <stop offset="100%" stop-color="#ffb547" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="330" cy="260" r="170" fill="url(#lglow)"/>
+        <ellipse cx="330" cy="260" rx="120" ry="50" fill="none" stroke="#33d9b2" stroke-width="1" stroke-dasharray="4 5" opacity="0.3"/>
+        <path d="M60,340 Q60,300 100,295 L140,260 Q160,245 190,245 L258,245 Q288,245 303,265 L328,295 Q344,300 344,340 Q344,355 328,355 L308,355 Q303,375 283,375 Q263,375 258,355 L150,355 Q145,375 125,375 Q105,375 100,355 L75,355 Q60,355 60,340 Z"
+              fill="rgba(51,217,178,.12)" stroke="#33d9b2" stroke-width="2"/>
+        <circle cx="112" cy="355" r="20" fill="#12161a" stroke="#33d9b2" stroke-width="2"/>
+        <circle cx="296" cy="355" r="20" fill="#12161a" stroke="#33d9b2" stroke-width="2"/>
+        <path d="M332,318 C350,300 356,338 373,323" fill="none" stroke="#ffb547" stroke-width="4" stroke-linecap="round"/>
+        <rect x="364" y="240" width="42" height="145" rx="9" fill="#1a2025" stroke="#2a3238" stroke-width="1.5"/>
+        <path d="M390,255 L376,292 L388,292 L382,322 L403,280 L390,280 Z" fill="#ffb547"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section-title">Why NEW GEN EV</div>
+  <div class="featgrid">
+    <div class="featcard">
+      <div class="featicon">⚡</div>
+      <h3>Live monitoring</h3>
+      <p>Voltage, current, power and energy — updated in real time from the actual meter, not estimates.</p>
+    </div>
+    <div class="featcard">
+      <div class="featicon">📅</div>
+      <h3>Slot booking</h3>
+      <p>Reserve ahead of time. No-shows auto-release after 15 minutes so the queue stays fair.</p>
+    </div>
+    <div class="featcard">
+      <div class="featicon">🔒</div>
+      <h3>Emergency safety</h3>
+      <p>Built-in emergency stop with instant alerts on the dashboard the moment it's triggered.</p>
+    </div>
+    <div class="featcard">
+      <div class="featicon">💳</div>
+      <h3>Transparent billing</h3>
+      <p>Charged only for real energy consumed, calculated live at a clear per-unit rate.</p>
+    </div>
+  </div>
+
+  <div class="ctaband">
+    <h2>Ready to charge smarter?</h2>
+    <p>Create your free account and start monitoring your charging station in minutes.</p>
+    <a href="/register.html" class="solid" style="padding:13px 28px;border-radius:9px">Get started free</a>
+  </div>
+
+  <div class="landfoot">
+    <div>© 2026 NEW GEN EV</div>
+    <div>
+      <a href="/goals.html">Goals</a>
+      <a href="/about.html">About &amp; Contact</a>
+    </div>
+  </div>
+</div>
+<script src="/app.js"></script>
 <script>
-location.href = localStorage.getItem('ev_token') ? '/dashboard.html' : '/login.html';
+if(Auth.getToken()){
+  document.getElementById('topBtns').innerHTML = '<a href="/dashboard.html" class="solid">Go to dashboard</a>';
+}
 </script>
-</body></html>
+</body>
+</html>
