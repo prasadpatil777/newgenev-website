@@ -70,16 +70,23 @@ initBookingBadge();
 function initAboutLink(){
   const nav = document.querySelector('.navlinks');
   if(!nav) return;
-  if(nav.querySelector('a[href="/about.html"]')) return;
-
-  const link = document.createElement('a');
-  link.href = '/about.html';
-  link.textContent = 'About';
-  if(location.pathname === '/about.html') link.className = 'active';
-
   const userChip = document.getElementById('userChip');
-  if(userChip) nav.insertBefore(link, userChip);
-  else nav.appendChild(link);
+
+  if(!nav.querySelector('a[href="/about.html"]')){
+    const link = document.createElement('a');
+    link.href = '/about.html';
+    link.textContent = 'About';
+    if(location.pathname === '/about.html') link.className = 'active';
+    if(userChip) nav.insertBefore(link, userChip); else nav.appendChild(link);
+  }
+
+  if(!nav.querySelector('a[href="/goals.html"]')){
+    const link2 = document.createElement('a');
+    link2.href = '/goals.html';
+    link2.textContent = 'Goals';
+    if(location.pathname === '/goals.html') link2.className = 'active';
+    if(userChip) nav.insertBefore(link2, userChip); else nav.appendChild(link2);
+  }
 }
 initAboutLink();
 
@@ -111,14 +118,19 @@ initAboutLink();
   const div = document.createElement('div');
   div.id = 'bgArt';
   div.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:#12161a;';
-  div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" style="opacity:0.07">
+  div.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" style="opacity:0.16">
     <defs>
-      <radialGradient id="bgGlow" cx="75%" cy="20%" r="60%">
+      <radialGradient id="bgGlow" cx="75%" cy="15%" r="65%">
         <stop offset="0%" stop-color="#ffb547" stop-opacity="1"/>
         <stop offset="100%" stop-color="#ffb547" stop-opacity="0"/>
       </radialGradient>
+      <radialGradient id="bgGlow2" cx="10%" cy="85%" r="55%">
+        <stop offset="0%" stop-color="#33d9b2" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#33d9b2" stop-opacity="0"/>
+      </radialGradient>
     </defs>
     <rect width="1200" height="800" fill="url(#bgGlow)"/>
+    <rect width="1200" height="800" fill="url(#bgGlow2)"/>
     <g stroke="#3a4650" stroke-width="1">
       <line x1="0" y1="100" x2="1200" y2="100"/><line x1="0" y1="200" x2="1200" y2="200"/>
       <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="400" x2="1200" y2="400"/>
@@ -135,7 +147,22 @@ initAboutLink();
     <circle cx="1078" cy="640" r="26" fill="none" stroke="#33d9b2" stroke-width="3"/>
     <path d="M320,180 L260,300 L300,300 L270,380 L370,240 L328,240 Z" fill="#ffb547"/>
     <ellipse cx="900" cy="330" rx="110" ry="46" fill="none" stroke="#33d9b2" stroke-width="1.5" stroke-dasharray="5 6"/>
+    <!-- solar panel -->
+    <g stroke="#ffb547" stroke-width="2" fill="none">
+      <rect x="120" y="560" width="160" height="90" transform="skewX(-12)"/>
+      <line x1="160" y1="560" x2="160" y2="650" transform="skewX(-12)"/>
+      <line x1="200" y1="560" x2="200" y2="650" transform="skewX(-12)"/>
+      <line x1="240" y1="560" x2="240" y2="650" transform="skewX(-12)"/>
+      <line x1="120" y1="590" x2="280" y2="590" transform="skewX(-12)"/>
+      <line x1="120" y1="620" x2="280" y2="620" transform="skewX(-12)"/>
+    </g>
   </svg>`;
   document.body.prepend(div);
+
+  const tagline = document.createElement('div');
+  tagline.style.cssText = 'position:fixed;top:70px;left:24px;z-index:-1;pointer-events:none;opacity:0.5;max-width:340px;';
+  tagline.innerHTML = `<div style="color:#ffb547;font-weight:800;font-size:15px;letter-spacing:.5px">POWERING TOMORROW'S MOBILITY</div>
+    <div style="color:#33d9b2;font-size:10.5px;letter-spacing:1.5px;margin-top:3px">CLEAN ENERGY &middot; SMART CHARGING &middot; FUTURE READY</div>`;
+  document.body.prepend(tagline);
 })();
 
