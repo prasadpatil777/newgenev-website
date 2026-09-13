@@ -87,6 +87,14 @@ function initAboutLink(){
     if(location.pathname === '/goals.html') link2.className = 'active';
     if(userChip) nav.insertBefore(link2, userChip); else nav.appendChild(link2);
   }
+
+  if(!nav.querySelector('a[href="/contact.html"]')){
+    const link3 = document.createElement('a');
+    link3.href = '/contact.html';
+    link3.textContent = 'Talk to an Expert';
+    if(location.pathname === '/contact.html') link3.className = 'active';
+    if(userChip) nav.insertBefore(link3, userChip); else nav.appendChild(link3);
+  }
 }
 initAboutLink();
 

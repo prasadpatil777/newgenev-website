@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth');
 const telemetryRoutes = require('./routes/telemetry');
 const sessionRoutes = require('./routes/sessions');
 const bookingRoutes = require('./routes/bookings');
+const contactRoutes = require('./routes/contact');
 const { pool, initSchema } = require('./db/init');
 
 const app = express();
@@ -18,6 +19,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', telemetryRoutes);
 app.use('/api', sessionRoutes);
 app.use('/api', bookingRoutes);
+app.use('/api', contactRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

@@ -60,6 +60,17 @@ async function initSchema() {
       created_at TIMESTAMPTZ DEFAULT now()
     );
 
+    CREATE TABLE IF NOT EXISTS contact_messages (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT,
+      enquiry_type TEXT,
+      message TEXT NOT NULL,
+      seen INTEGER NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT now()
+    );
+
     CREATE INDEX IF NOT EXISTS idx_bookings_station ON bookings(station_id, slot_start);
     CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(user_id, slot_start);
     CREATE INDEX IF NOT EXISTS idx_telemetry_station ON telemetry(station_id, received_at);
