@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Talk to an Expert - NEW GEN EV</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.contacthead{margin-top:30px}
+.contacthead .eyebrow{color:var(--amber);font-size:12px;font-weight:700;letter-spacing:1.5px}
+.contacthead h1{font-size:32px;margin:8px 0 12px}
+.contacthead h1 span{color:var(--teal)}
+.contacthead p{color:var(--muted);font-size:14px;max-width:520px}
+
+.contactlayout{display:grid;grid-template-columns:1fr 1.3fr;gap:24px;margin-top:24px}
+@media(max-width:820px){.contactlayout{grid-template-columns:1fr}}
+
+.reasoncard{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.reasoncard:last-child{border-bottom:none}
+.reasonicon{width:38px;height:38px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.reasoncard b{font-size:14px}
+.reasoncard p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+
+.formcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px}
+.formrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.formrow{grid-template-columns:1fr}}
+.formcard label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px}
+.formcard input,.formcard select,.formcard textarea{
+  width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);font-size:14px;font-family:var(--font-ui);
+}
+.formcard textarea{resize:vertical;min-height:90px}
+.formcard input:focus,.formcard select:focus,.formcard textarea:focus{outline:none;border-color:var(--amber)}
+.successbox{background:rgba(51,217,178,.12);border:1px solid var(--teal);color:var(--teal);padding:12px 16px;border-radius:8px;margin-top:16px;display:none}
+.successbox.show{display:block}
+
+.msgrow{padding:12px 0;border-bottom:1px solid var(--line);font-size:13px}
+.msgrow:last-child{border-bottom:none}
+.msgrow .meta{color:var(--muted);font-size:11.5px;margin-top:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
+    <div class="navlinks">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/history.html">History</a>
+      <a href="/booking.html">Book a slot</a>
+      <a href="/goals.html">Goals</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html" class="active">Talk to an Expert</a>
+      <span id="userChip" style="color:var(--text)"></span>
+    </div>
+    <button class="logout" onclick="Auth.logout()">Log out</button>
+  </div>
+
+  <div class="contacthead">
+    <div class="eyebrow">● CONTACT</div>
+    <h1>Talk to <span>NEW GEN EV</span></h1>
+    <p>Tell us what you need — charging support, a booking issue, a partnership idea, or anything else. We'll get back to you.</p>
+  </div>
+
+  <div class="contactlayout">
+    <div>
+      <div class="section-title" style="margin-top:0">We'll route you to the right person</div>
+      <div class="card" style="padding:4px 20px">
+        <div class="reasoncard">
+          <div class="reasonicon">🔌</div>
+          <div><b>Charging support</b><p>Help using the station, sessions, or billing.</p></div>
+        </div>
+        <div class="reasoncard">
+          <div class="reasonicon">📅</div>
+          <div><b>Booking help</b><p>Trouble booking, checking in, or cancelling a slot.</p></div>
+        </div>
+        <div class="reasoncard">
+          <div class="reasonicon">🤝</div>
+          <div><b>Partnerships</b><p>Interested in hosting or partnering with us.</p></div>
+        </div>
+        <div class="reasoncard">
+          <div class="reasonicon">📰</div>
+          <div><b>Media &amp; press</b><p>Story angles, brand assets, and press enquiries.</p></div>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:14px">Prasad Patil, Charging Station Owner · +91 74107 22330</p>
+    </div>
+
+    <div class="formcard">
+      <form id="contactForm">
+        <div class="formrow">
+          <div><label for="cname">Name *</label><input id="cname" required></div>
+          <div><label for="cemail">Email *</label><input id="cemail" type="email" required></div>
+        </div>
+        <div class="formrow">
+          <div><label for="cphone">Phone</label><input id="cphone" type="tel"></div>
+          <div>
+            <label for="ctype">Enquiry type</label>
+            <select id="ctype">
+              <option value="Charging support">Charging support</option>
+              <option value="Booking help">Booking help</option>
+              <option value="Partnership">Partnership</option>
+              <option value="Media">Media &amp; press</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <label for="cmsg">Message *</label>
+        <textarea id="cmsg" required placeholder="Tell us what's going on..."></textarea>
+        <button class="btn" type="submit" style="margin-top:18px">Submit enquiry</button>
+      </form>
+      <div class="successbox" id="successBox">Thanks — your message has been sent. We'll get back to you soon.</div>
+      <div class="err" id="cErr" style="display:none;margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="ownerOnly" id="ownerMsgs" style="display:none">
+    <div class="section-title">Submitted messages (owner view)</div>
+    <div class="card" style="padding:4px 20px" id="msgList"></div>
+  </div>
+
+  <div style="height:40px"></div>
+</div>
+<script src="/app.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const errEl = document.getElementById('cErr');
+  errEl.style.display='none';
+  try{
+    await api('/contact', {
+      method:'POST',
+      body: JSON.stringify({
+        name: document.getElementById('cname').value,
+        email: document.getElementById('cemail').value,
+        phone: document.getElementById('cphone').value,
+        enquiryType: document.getElementById('ctype').value,
+        message: document.getElementById('cmsg').value
+      })
+    });
+    document.getElementById('contactForm').reset();
+    document.getElementById('successBox').classList.add('show');
+  }catch(e){
+    errEl.textContent = e.message;
+    errEl.style.display='block';
+  }
+});
+
+async function loadOwnerMessages(){
+  if(!Auth.getToken()) return;
+  try{
+    const data = await api('/contact/messages');
+    document.getElementById('ownerMsgs').style.display = 'block';
+    const list = document.getElementById('msgList');
+    if(!data.messages.length){
+      list.innerHTML = '<div class="empty">No messages yet.</div>';
+      return;
+    }
+    list.innerHTML = data.messages.map(m => `
+      <div class="msgrow">
+        <b>${m.name}</b> &middot; ${m.enquiry_type || 'General'}
+        <div class="meta">${m.email}${m.phone ? ' · '+m.phone : ''} · ${new Date(m.created_at).toLocaleString()}</div>
+        <div style="margin-top:6px">${m.message}</div>
+      </div>`).join('');
+  }catch(e){ /* not the owner - fine, section stays hidden */ }
+}
+loadOwnerMessages();
+</script>
+</body>
+</html>
