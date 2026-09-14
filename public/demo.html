@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a Demo - NEW GEN EV</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.demohead{margin-top:30px}
+.demohead .eyebrow{color:var(--amber);font-size:12px;font-weight:700;letter-spacing:1.5px}
+.demohead h1{font-size:34px;margin:8px 0 14px}
+.demohead h1 span{color:var(--teal)}
+.demohead p{color:var(--muted);font-size:14px;max-width:520px}
+
+.demolayout{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;margin-top:30px}
+@media(max-width:820px){.demolayout{grid-template-columns:1fr}}
+
+.checklist{list-style:none;margin:0;padding:0}
+.checklist li{display:flex;gap:10px;padding:11px 0;font-size:13.5px;color:var(--text)}
+.checklist li .tick{color:var(--teal);font-weight:800;flex-shrink:0}
+
+.formcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px}
+.formrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:480px){.formrow{grid-template-columns:1fr}}
+.formcard label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px}
+.formcard input,.formcard select,.formcard textarea{
+  width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--text);font-size:14px;font-family:var(--font-ui);
+}
+.formcard textarea{resize:vertical;min-height:80px}
+.formcard input:focus,.formcard select:focus,.formcard textarea:focus{outline:none;border-color:var(--amber)}
+.agreerow{display:flex;align-items:flex-start;gap:8px;margin-top:16px;font-size:12.5px;color:var(--muted)}
+.agreerow input{width:auto;margin-top:2px}
+.successbox{background:rgba(51,217,178,.12);border:1px solid var(--teal);color:var(--teal);padding:12px 16px;border-radius:8px;margin-top:16px;display:none}
+.successbox.show{display:block}
+
+.ctaband{
+  background:linear-gradient(160deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:16px;
+  padding:36px;text-align:center;margin-top:40px;
+}
+.ctaband h2{margin:0 0 10px;font-size:22px}
+.ctaband h2 span{color:var(--teal)}
+.ctaband p{color:var(--muted);margin:0 0 20px;font-size:14px}
+.ctabtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.ctabtns a{padding:12px 24px;border-radius:9px;text-decoration:none;font-weight:700;font-size:14px}
+.ctabtns .primary{background:var(--amber);color:#241300}
+.ctabtns .secondary{border:1px solid var(--line);color:var(--text)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
+    <div class="navlinks">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/history.html">History</a>
+      <a href="/booking.html">Book a slot</a>
+      <a href="/goals.html">Goals</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Talk to an Expert</a>
+      <a href="/demo.html" class="active">Book a Demo</a>
+      <span id="userChip" style="color:var(--text)"></span>
+    </div>
+    <button class="logout" onclick="Auth.logout()">Log out</button>
+  </div>
+
+  <div class="demohead">
+    <div class="eyebrow">● BOOK A DEMO</div>
+    <h1>See <span>NEW GEN EV</span> in action</h1>
+    <p>See how NEW GEN EV tracks live charging, handles slot bookings, and calculates billing in real time — end to end, hardware to dashboard.</p>
+  </div>
+
+  <div class="demolayout">
+    <div>
+      <div class="section-title" style="margin-top:0">What you'll see</div>
+      <ul class="checklist">
+        <li><span class="tick">✔</span> How live voltage, current, power and energy show up on one dashboard</li>
+        <li><span class="tick">✔</span> RFID-based charging start/stop, working with the real hardware</li>
+        <li><span class="tick">✔</span> Slot booking, check-in, and the 15-minute auto-release in action</li>
+        <li><span class="tick">✔</span> Real-time billing calculated from actual energy consumed</li>
+        <li><span class="tick">✔</span> Emergency-stop safety monitoring on the live dashboard</li>
+      </ul>
+    </div>
+
+    <div class="formcard">
+      <form id="demoForm">
+        <div class="formrow">
+          <div><label for="dname">Name *</label><input id="dname" required></div>
+          <div><label for="demail">Work email *</label><input id="demail" type="email" required></div>
+        </div>
+        <div class="formrow">
+          <div><label for="dphone">Phone</label><input id="dphone" type="tel"></div>
+          <div><label for="dcompany">Company / Organisation</label><input id="dcompany"></div>
+        </div>
+        <div class="formrow">
+          <div>
+            <label for="duse">Use case *</label>
+            <select id="duse" required>
+              <option value="">Select...</option>
+              <option value="Personal EV use">Personal EV use</option>
+              <option value="College / hackathon project">College / hackathon project</option>
+              <option value="Business / commercial site">Business / commercial site</option>
+              <option value="Investor / partnership interest">Investor / partnership interest</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div><label for="ddate">Preferred date</label><input id="ddate" type="date"></div>
+        </div>
+        <label for="dmsg">Anything we should know?</label>
+        <textarea id="dmsg" placeholder="Tell us a bit about what you'd like to see..."></textarea>
+        <label class="agreerow"><input type="checkbox" id="dagree" required> I agree to be contacted by NEW GEN EV about my enquiry.</label>
+        <button class="btn" type="submit" style="margin-top:18px">Schedule Demo</button>
+      </form>
+      <div class="successbox" id="successBox">Thanks — your demo request has been sent. We'll be in touch to schedule a time.</div>
+      <div class="err" id="dErr" style="display:none;margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="ctaband">
+    <h2>Ready to see <span>NEW GEN EV</span> in action?</h2>
+    <p>Talk to us about charging, booking, billing, or hardware integration.</p>
+    <div class="ctabtns">
+      <a href="#demoForm" class="primary" onclick="document.getElementById('dname').focus()">Book a Demo</a>
+      <a href="/contact.html" class="secondary">Talk to an Expert</a>
+    </div>
+  </div>
+
+  <div style="height:40px"></div>
+</div>
+<script src="/app.js"></script>
+<script>
+document.getElementById('demoForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const errEl = document.getElementById('dErr');
+  errEl.style.display='none';
+  try{
+    const date = document.getElementById('ddate').value;
+    const company = document.getElementById('dcompany').value;
+    const useCase = document.getElementById('duse').value;
+    const extra = [
+      useCase ? `Use case: ${useCase}` : '',
+      company ? `Company: ${company}` : '',
+      date ? `Preferred date: ${date}` : ''
+    ].filter(Boolean).join(' · ');
+
+    await api('/contact', {
+      method:'POST',
+      body: JSON.stringify({
+        name: document.getElementById('dname').value,
+        email: document.getElementById('demail').value,
+        phone: document.getElementById('dphone').value,
+        enquiryType: 'Demo Request',
+        message: (document.getElementById('dmsg').value || 'Would like a demo walkthrough.') + (extra ? ' — ' + extra : '')
+      })
+    });
+    document.getElementById('demoForm').reset();
+    document.getElementById('successBox').classList.add('show');
+  }catch(e){
+    errEl.textContent = e.message;
+    errEl.style.display='block';
+  }
+});
+</script>
+</body>
+</html>
