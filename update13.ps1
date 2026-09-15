@@ -1,4 +1,5 @@
-﻿const Auth = {
+@'
+const Auth = {
   getToken(){ return localStorage.getItem('ev_token'); },
   setSession(token, user){
     localStorage.setItem('ev_token', token);
@@ -200,3 +201,4 @@ initAboutLink();
   document.body.prepend(tagline);
 })();
 
+'@ | Set-Content -Path "public/app.js" -Encoding UTF8
