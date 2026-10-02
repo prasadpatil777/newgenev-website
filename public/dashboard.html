@@ -83,7 +83,6 @@ async function loadKey(){
     const data = await api('/auth/me');
     if(data.stations && data.stations[0]){
       document.getElementById('apiKey').textContent = data.stations[0].api_key;
-      document.getElementById('stationName').textContent = data.stations[0].name;
     }
   }catch(e){}
 }
@@ -115,14 +114,14 @@ function drawChart(points){
     const y = h - ((v - min) / range) * (h - 20) - 10;
     if(idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
-  ctx.strokeStyle = '#ffb340';
+  ctx.strokeStyle = '#2156d8';
   ctx.lineWidth = 2;
   ctx.stroke();
 
   ctx.lineTo(w, h);
   ctx.lineTo(0, h);
   ctx.closePath();
-  ctx.fillStyle = 'rgba(255,179,64,0.08)';
+  ctx.fillStyle = 'rgba(33,86,216,0.08)';
   ctx.fill();
 }
 
@@ -160,6 +159,7 @@ async function refresh(){
     const data = await api('/live');
     const dot = document.getElementById('statusDot');
     dot.className = 'pulse-dot' + (data.online ? '' : ' off');
+    if(data.station) document.getElementById('stationName').textContent = data.station.name;
 
     // If the station hasn't sent anything in the last 10s (data.online is
     // false), don't keep showing whatever state happened to be saved last
