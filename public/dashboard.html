@@ -166,28 +166,40 @@ function drawChart(points){
 // the real server value every time fresh data arrives — this both keeps
 // it smooth AND self-corrects any drift, and immediately reflects a
 // reset to 0 right after a new RFID tap starts a session.
-let timeAnchorSec = 0;
+// The server also says how old the reading is (ageMs), so the estimate is
+// "session seconds when sent + time since then". Small differences are
+// ignored so the clock never ticks backwards; big ones (new session, stop)
+// snap immediately.
+let timeAnchorMs = 0;          // session time (ms) at timeAnchorAt
 let timeAnchorAt = Date.now();
 let timeIsTicking = false;
+let timeState = null;
 
-function syncTimeAnchor(serverSec, state){
-  timeAnchorSec = Math.max(0, Math.floor(serverSec || 0));
-  timeAnchorAt = Date.now();
-  timeIsTicking = (state === 'CHARGING');
+function currentSessionMs(){
+  return timeAnchorMs + (timeIsTicking ? Date.now() - timeAnchorAt : 0);
+}
+
+function syncTimeAnchor(serverSec, state, ageMs){
+  const ticking = (state === 'CHARGING');
+  // time_sec is whole seconds, so the real value is on average +0.5 s.
+  const estimate = Math.max(0, (Math.floor(serverSec || 0) + (ticking ? 0.5 : 0)) * 1000 + (ticking ? (ageMs || 0) : 0));
+  const predicted = currentSessionMs();
+  const drift = estimate - predicted;
+  if(state !== timeState || !ticking || !timeIsTicking || drift > 1200 || drift < -1500){
+    timeAnchorMs = estimate; timeAnchorAt = Date.now();
+  }
+  timeIsTicking = ticking;
+  timeState = state;
   renderTime();
 }
 
 function renderTime(){
-  let sec = timeAnchorSec;
-  if(timeIsTicking){
-    sec += Math.floor((Date.now() - timeAnchorAt) / 1000);
-  }
+  const sec = timeIsTicking ? Math.floor(currentSessionMs() / 1000) : Math.floor(timeAnchorMs / 1000);
   document.getElementById('time').textContent = fmtTime(sec);
 }
 
-async function refresh(){
+function paintLive(data){
   try{
-    const data = await api('/live');
     const dot = document.getElementById('statusDot');
     dot.className = 'pulse-dot' + (data.online ? '' : ' off');
     if(data.station) document.getElementById('stationName').textContent = data.station.name;
@@ -206,7 +218,7 @@ async function refresh(){
     document.getElementById('kwh').innerHTML = (t? t.kwh.toFixed(3):'0.000') + '<small>kWh</small>';
     document.getElementById('temp').innerHTML = (t? t.temp.toFixed(1):'0.0') + '<small>°C</small>';
     document.getElementById('relay').textContent = (t && t.relay) ? 'ON' : 'OFF';
-    syncTimeAnchor(t ? t.time_sec : 0, t ? t.state : null);
+    syncTimeAnchor(t ? t.time_sec : 0, (data.online && t) ? t.state : null, data.ageMs);
 
     const emgBanner = document.getElementById('emgBanner');
     emgBanner.classList.toggle('show', !!(t && t.emergency));
@@ -215,6 +227,32 @@ async function refresh(){
     const rate = 23;
     document.getElementById('units').textContent = sessionKwh.toFixed(3);
     document.getElementById('bill').textContent = '₹' + (sessionKwh*rate).toFixed(2);
+  }catch(e){
+    console.error(e);
+  }
+}
+
+// ---- Live updates ----
+// Main path: a Server-Sent Events stream - the server pushes every new
+// reading the instant the ESP32 sends it. Fallback: if the stream is down
+// (or the browser blocks it), poll /api/live every 0.5 s as before.
+let lastStreamMsg = 0;
+function startStream(){
+  if(!window.EventSource || !Auth.getToken()) return;
+  const es = new EventSource('/api/live/stream?token=' + encodeURIComponent(Auth.getToken()));
+  es.onmessage = ev => {
+    lastStreamMsg = Date.now();
+    try{ paintLive(JSON.parse(ev.data)); }catch(e){ console.error(e); }
+  };
+  // Pings arrive as comments (no onmessage), but keep the connection marked alive.
+  es.addEventListener('open', ()=>{ lastStreamMsg = Date.now(); });
+  es.onerror = () => { /* browser auto-reconnects; polling covers the gap */ };
+}
+
+async function refresh(){
+  if(Date.now() - lastStreamMsg < 2500) return;   // stream is live, no need to poll
+  try{
+    paintLive(await api('/live'));
   }catch(e){
     console.error(e);
   }
@@ -274,10 +312,11 @@ async function refreshChart(){
 
 loadKey();
 refresh();
+startStream();
 refreshChart();
-setInterval(refresh, 1000);
+setInterval(refresh, 500);
 setInterval(refreshChart, 3000);
-setInterval(renderTime, 1000);
+setInterval(renderTime, 250);
 </script>
 </body>
 </html>
