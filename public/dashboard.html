@@ -18,6 +18,8 @@
 .locbtn.primary{background:var(--amber);border-color:var(--amber);color:#fff}
 .locbtn:disabled{opacity:.6;cursor:wait}
 @media(max-width:600px){.mapbox{height:240px}}
+.keytoggle{background:none;border:0;padding:0;color:var(--muted);font:500 13px var(--font-ui);text-decoration:underline;cursor:pointer}
+.keytoggle:hover{color:var(--text)}
 </style>
 </head>
 <body>
@@ -93,9 +95,14 @@
     <div class="hint" id="locMsg"></div>
   </div>
 
-  <div class="section-title">Your station's API key</div>
-  <p class="hint">Put this in your ESP32 code so it can send data here. Keep it private.</p>
-  <div class="card" style="margin-top:8px"><code id="apiKey">loading...</code></div>
+  <!-- Station API key: hidden by default, and only the owner ever sees the toggle. -->
+  <div id="keyBox" hidden style="margin-top:28px">
+    <button type="button" id="keyToggle" class="keytoggle">Show station API key</button>
+    <div id="keyPanel" hidden>
+      <p class="hint">Put this in the ESP32 code so it can send data here. Keep it private.</p>
+      <div class="card" style="margin-top:8px"><code id="apiKey">loading...</code></div>
+    </div>
+  </div>
 </div>
 
 <script src="/app.js"></script>
@@ -109,6 +116,7 @@ function fmtTime(sec){
   return m + ':' + String(s).padStart(2,'0');
 }
 
+// The key is fetched only when the owner asks to see it.
 async function loadKey(){
   try{
     const data = await api('/auth/me');
@@ -117,6 +125,13 @@ async function loadKey(){
     }
   }catch(e){}
 }
+document.getElementById('keyToggle').addEventListener('click', ()=>{
+  const panel = document.getElementById('keyPanel');
+  const btn = document.getElementById('keyToggle');
+  panel.hidden = !panel.hidden;
+  btn.textContent = panel.hidden ? 'Show station API key' : 'Hide station API key';
+  if(!panel.hidden) loadKey();
+});
 
 function drawChart(points){
   const canvas = document.getElementById('chart');
@@ -273,6 +288,7 @@ function paintLocation(data){
     loc.lat.toFixed(5) + ', ' + loc.lng.toFixed(5) +
     (loc.updatedAt ? ' · updated ' + new Date(loc.updatedAt).toLocaleString() : '');
   document.getElementById('locUpdate').style.display = data.isOwner ? 'inline-block' : 'none';
+  document.getElementById('keyBox').hidden = !data.isOwner;
   const key = loc.lat + ',' + loc.lng;
   if(key !== shownLoc){
     shownLoc = key;
@@ -310,7 +326,6 @@ async function refreshChart(){
   }
 }
 
-loadKey();
 refresh();
 startStream();
 refreshChart();
