@@ -123,7 +123,7 @@ initAboutLink();
 
   const themeMeta = document.createElement('meta');
   themeMeta.name = 'theme-color';
-  themeMeta.content = '#0b0f14';
+  themeMeta.content = '#000000';
   document.head.appendChild(themeMeta);
 
   if('serviceWorker' in navigator){
@@ -133,6 +133,31 @@ initAboutLink();
   }
 })();
 
-// The color glow now lives directly on body{} in style.css (richer, three-tone
-// wash), so no extra background layer is injected here — one source of truth,
-// no double-stacked gradients.
+// The color glow lives on body{} in style.css. On top of that, a single quiet
+// line-art illustration (an EV plugged into a charging pedestal) sits fixed
+// in the bottom-right corner of every page, bleeding off-screen — barely
+// visible, never competing with the real content, just enough to say "this
+// is an EV charging product" at a glance.
+(function initBackgroundArt(){
+  if(document.getElementById('bgArt')) return;
+  const div = document.createElement('div');
+  div.id = 'bgArt';
+  div.style.cssText = 'position:fixed;right:-6vw;bottom:-6vh;z-index:-1;pointer-events:none;width:min(62vw,780px);opacity:0.07;';
+  div.innerHTML = `<svg viewBox="0 0 640 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M40,330 C40,290 80,280 120,275 L170,230 Q195,210 230,210 L360,210 Q400,210 420,236 L458,278 Q492,284 492,330 Q492,350 470,350 L440,350 Q432,378 400,378 Q368,378 360,350 L190,350 Q182,378 150,378 Q118,378 110,350 L62,350 Q40,350 40,330 Z"
+      stroke="#fafafa" stroke-width="2.5"/>
+    <path d="M175,232 L222,214 Q234,210 247,210 L352,210 Q372,211 386,224 L414,250 Z"
+      stroke="#fafafa" stroke-width="2"/>
+    <circle cx="150" cy="350" r="34" stroke="#ffb23f" stroke-width="3"/>
+    <circle cx="150" cy="350" r="11" stroke="#ffb23f" stroke-width="2"/>
+    <circle cx="400" cy="350" r="34" stroke="#ffb23f" stroke-width="3"/>
+    <circle cx="400" cy="350" r="11" stroke="#ffb23f" stroke-width="2"/>
+    <rect x="520" y="130" width="70" height="230" rx="14" stroke="#3ddc84" stroke-width="2.5"/>
+    <rect x="536" y="152" width="38" height="44" rx="5" stroke="#3ddc84" stroke-width="2"/>
+    <path d="M562,168 L548,192 L558,192 L552,214 L570,186 L560,186 Z" fill="#3ddc84"/>
+    <path d="M492,300 C510,296 516,270 520,250" stroke="#3ddc84" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="492" cy="300" r="5" fill="#3ddc84"/>
+    <circle cx="520" cy="250" r="5" fill="#3ddc84"/>
+  </svg>`;
+  document.body.prepend(div);
+})();
