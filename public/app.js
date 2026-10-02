@@ -133,69 +133,16 @@ initAboutLink();
   }
 })();
 
-// Subtle full-page background illustration (EV + charging theme), sits
-// behind all content so the live dashboard/cards stay fully readable on top.
+// Quiet full-page background glow (sits behind all content). Kept deliberately
+// restrained — a single soft radial wash, no grid lines, no floating icons —
+// so the black surface reads as premium rather than decorated.
 (function initBackgroundArt(){
   if(document.getElementById('bgArt')) return;
   const div = document.createElement('div');
   div.id = 'bgArt';
-  div.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:#12161a;';
-  div.innerHTML = `<style>
-    @keyframes bgPulse{0%,100%{opacity:.85;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
-    @keyframes bgFlow{to{stroke-dashoffset:-40}}
-    @keyframes bgFlicker{0%,19%,21%,54%,56%,100%{opacity:1}20%,55%{opacity:.55}}
-    @keyframes bgSpin{to{transform:rotate(360deg)}}
-    @keyframes bgGrid{0%,100%{opacity:.08}50%{opacity:.18}}
-    #bgArt .glowPulse{animation:bgPulse 5s ease-in-out infinite;transform-origin:center}
-    #bgArt .flowLine{stroke-dasharray:10 8;animation:bgFlow 1.4s linear infinite}
-    #bgArt .boltFlicker{animation:bgFlicker 4s linear infinite;transform-origin:320px 260px}
-    #bgArt .orbitSpin{animation:bgSpin 22s linear infinite;transform-origin:900px 330px}
-    #bgArt .gridLine{animation:bgGrid 6s ease-in-out infinite}
-  </style>
-  <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" style="opacity:0.18">
-    <defs>
-      <radialGradient id="bgGlow" cx="75%" cy="15%" r="65%">
-        <stop offset="0%" stop-color="#ffb547" stop-opacity="1"/>
-        <stop offset="100%" stop-color="#ffb547" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="bgGlow2" cx="10%" cy="85%" r="55%">
-        <stop offset="0%" stop-color="#33d9b2" stop-opacity="1"/>
-        <stop offset="100%" stop-color="#33d9b2" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-    <rect class="glowPulse" width="1200" height="800" fill="url(#bgGlow)"/>
-    <rect class="glowPulse" width="1200" height="800" fill="url(#bgGlow2)" style="animation-delay:-2.5s"/>
-    <g class="gridLine" stroke="#3a4650" stroke-width="1">
-      <line x1="0" y1="100" x2="1200" y2="100"/><line x1="0" y1="200" x2="1200" y2="200"/>
-      <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="400" x2="1200" y2="400"/>
-      <line x1="0" y1="500" x2="1200" y2="500"/><line x1="0" y1="600" x2="1200" y2="600"/>
-      <line x1="0" y1="700" x2="1200" y2="700"/>
-      <line x1="150" y1="0" x2="150" y2="800"/><line x1="300" y1="0" x2="300" y2="800"/>
-      <line x1="450" y1="0" x2="450" y2="800"/><line x1="600" y1="0" x2="600" y2="800"/>
-      <line x1="750" y1="0" x2="750" y2="800"/><line x1="900" y1="0" x2="900" y2="800"/>
-      <line x1="1050" y1="0" x2="1050" y2="800"/>
-    </g>
-    <path class="flowLine" d="M780,620 Q780,570 830,563 L880,515 Q905,495 940,495 L1030,495 Q1068,495 1088,522 L1120,562 Q1140,568 1140,620 Q1140,640 1120,640 L1094,640 Q1088,666 1062,666 Q1036,666 1030,640 L890,640 Q884,666 858,666 Q832,666 826,640 L796,640 Q780,640 780,620 Z"
-          fill="none" stroke="#33d9b2" stroke-width="3"/>
-    <circle cx="838" cy="640" r="26" fill="none" stroke="#33d9b2" stroke-width="3"/>
-    <circle cx="1078" cy="640" r="26" fill="none" stroke="#33d9b2" stroke-width="3"/>
-    <path class="boltFlicker" d="M320,180 L260,300 L300,300 L270,380 L370,240 L328,240 Z" fill="#ffb547"/>
-    <g class="orbitSpin"><ellipse cx="900" cy="330" rx="110" ry="46" fill="none" stroke="#33d9b2" stroke-width="1.5" stroke-dasharray="5 6"/></g>
-    <!-- solar panel -->
-    <g stroke="#ffb547" stroke-width="2" fill="none">
-      <rect x="120" y="560" width="160" height="90" transform="skewX(-12)"/>
-      <line x1="160" y1="560" x2="160" y2="650" transform="skewX(-12)"/>
-      <line x1="200" y1="560" x2="200" y2="650" transform="skewX(-12)"/>
-      <line x1="240" y1="560" x2="240" y2="650" transform="skewX(-12)"/>
-      <line x1="120" y1="590" x2="280" y2="590" transform="skewX(-12)"/>
-      <line x1="120" y1="620" x2="280" y2="620" transform="skewX(-12)"/>
-    </g>
-  </svg>`;
+  div.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:'
+    + 'radial-gradient(60% 40% at 85% -5%, rgba(255,178,63,.07), transparent 60%),'
+    + 'radial-gradient(50% 35% at 5% 100%, rgba(61,220,132,.05), transparent 60%),'
+    + '#000000;';
   document.body.prepend(div);
-
-  const tagline = document.createElement('div');
-  tagline.style.cssText = 'position:fixed;top:70px;left:24px;z-index:-1;pointer-events:none;opacity:0.5;max-width:340px;';
-  tagline.innerHTML = `<div style="color:#ffb547;font-weight:800;font-size:15px;letter-spacing:.5px">POWERING TOMORROW'S MOBILITY</div>
-    <div style="color:#33d9b2;font-size:10.5px;letter-spacing:1.5px;margin-top:3px">CLEAN ENERGY &middot; SMART CHARGING &middot; FUTURE READY</div>`;
-  document.body.prepend(tagline);
 })();
