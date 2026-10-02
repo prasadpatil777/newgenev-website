@@ -6,20 +6,31 @@
 <title>Our Goals - NEW GEN EV</title>
 <link rel="stylesheet" href="/style.css">
 <style>
-.goalgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:14px}
+.goalgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
 @media(max-width:700px){.goalgrid{grid-template-columns:1fr}}
-.goalcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
-.goalicon{
-  width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(150deg,var(--amber),#ff8a3d);margin-bottom:14px;font-size:20px;
-}
-.goalcard h3{margin:0 0 8px;font-size:15.5px}
-.goalcard p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.6}
+.goalcard{position:relative;background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:22px 22px 22px 24px;overflow:hidden;transition:border-color .15s ease,background .15s ease}
+.goalcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--amber),rgba(255,179,64,.15))}
+.goalcard:nth-child(2)::before{background:linear-gradient(180deg,var(--blue),rgba(91,157,255,.15))}
+.goalcard:nth-child(3)::before{background:linear-gradient(180deg,var(--red),rgba(255,93,93,.15))}
+.goalcard:nth-child(4)::before{background:linear-gradient(180deg,var(--teal),rgba(43,217,160,.15))}
+.goalcard:nth-child(5)::before{background:linear-gradient(180deg,var(--blue),rgba(91,157,255,.15))}
+.goalcard:nth-child(6)::before{background:linear-gradient(180deg,var(--teal),rgba(43,217,160,.15))}
+.goalcard:hover{border-color:var(--line);background:var(--panel-2)}
+.goalicon{width:32px;height:32px;color:var(--text);margin-bottom:14px}
+.goalicon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.6}
+.goalcard h3{margin:0 0 8px;font-size:15.5px;font-weight:600;font-family:var(--font-ui)}
+.goalcard p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.65}
+
 .missionband{
+  position:relative;overflow:hidden;
   background: linear-gradient(160deg, var(--panel-2), var(--panel));
-  border:1px solid var(--line); border-radius:16px; padding:28px 30px; margin-top:24px; text-align:center;
+  border:1px solid var(--line-soft); border-radius:var(--radius-lg); padding:34px 30px; margin-top:24px; text-align:center;
 }
-.missionband p{max-width:600px;margin:10px auto 0;color:var(--muted);font-size:14px;line-height:1.7}
+.missionband::before{content:'';position:absolute;inset:0;background:radial-gradient(60% 100% at 50% 0%, rgba(255,179,64,.08), transparent 70%)}
+.missionband .eyebrow{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--teal);font-weight:500;position:relative}
+.missionband .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(43,217,160,.18)}
+.missionband h2{font-family:var(--font-display);font-weight:600;font-size:23px;margin:12px 0 0;position:relative}
+.missionband p{max-width:600px;margin:12px auto 0;color:var(--muted);font-size:14.5px;line-height:1.7;position:relative}
 </style>
 </head>
 <body>
@@ -37,39 +48,40 @@
   </div>
 
   <div class="missionband">
-    <div style="color:var(--amber);font-weight:800;font-size:22px">Our Mission</div>
-    <p>To make EV charging simple, transparent and accessible — a smart, RFID-based station that any EV owner can book, use and pay for in real time, backed by data every step of the way.</p>
+    <div class="eyebrow"><span class="dot"></span>Our mission</div>
+    <h2>Charging should be simple, transparent and fair</h2>
+    <p>A smart, RFID-based station that any EV owner can book, use and pay for in real time — backed by data every step of the way.</p>
   </div>
 
   <div class="section-title">What we're working toward</div>
   <div class="goalgrid">
     <div class="goalcard">
-      <div class="goalicon">⚡</div>
+      <div class="goalicon"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" stroke-linejoin="round"/></svg></div>
       <h3>Reliable, real-time charging</h3>
       <p>Live voltage, current, power and energy readings straight from the meter — no guesswork, no waiting to find out what happened during a session.</p>
     </div>
     <div class="goalcard">
-      <div class="goalicon">📅</div>
+      <div class="goalicon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
       <h3>Zero-hassle booking</h3>
       <p>Reserve a slot in advance, and if you don't show up within 15 minutes, it's released automatically — fair access for everyone, no manual coordination needed.</p>
     </div>
     <div class="goalcard">
-      <div class="goalicon">🔒</div>
+      <div class="goalicon"><svg viewBox="0 0 24 24"><path d="M12 2 3 6v6c0 5 4 8.5 9 10 5-1.5 9-5 9-10V6l-9-4Z"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg></div>
       <h3>Safety first</h3>
       <p>Emergency-stop monitoring, relay protection, and an always-on dashboard mean the station can be watched and controlled from anywhere.</p>
     </div>
     <div class="goalcard">
-      <div class="goalicon">🌱</div>
+      <div class="goalicon"><svg viewBox="0 0 24 24"><path d="M12 22c4-3 7-6.5 7-11a7 7 0 0 0-14 0c0 4.5 3 8 7 11Z"/><path d="M12 7v6M9 10h6"/></svg></div>
       <h3>Supporting cleaner mobility</h3>
       <p>Every session tracked here is a step toward making EV adoption easier — reliable infrastructure is one of the biggest barriers to going electric, and that's what we're building.</p>
     </div>
     <div class="goalcard">
-      <div class="goalicon">📊</div>
+      <div class="goalicon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></div>
       <h3>Transparent billing</h3>
       <p>Bills are calculated directly from real energy consumed (not estimates), so every user sees exactly what they used and what they owe.</p>
     </div>
     <div class="goalcard">
-      <div class="goalicon">🚀</div>
+      <div class="goalicon"><svg viewBox="0 0 24 24"><path d="M4 21s1-7 5-11 11-5 11-5-1 7-5 11-11 5-11 5Z"/><circle cx="14" cy="10" r="2"/></svg></div>
       <h3>Built to grow</h3>
       <p>From a single station today to a network tomorrow — the same dashboard, booking system and app are designed to scale to more chargers and more locations.</p>
     </div>
