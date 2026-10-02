@@ -218,7 +218,7 @@ async function refresh(){
     emgBanner.classList.toggle('show', !!(t && t.emergency));
 
     const sessionKwh = t ? (t.session_wh/1000) : 0;
-    const rate = 20;
+    const rate = 23;
     document.getElementById('units').textContent = sessionKwh.toFixed(3);
     document.getElementById('bill').textContent = '₹' + (sessionKwh*rate).toFixed(2);
   }catch(e){
