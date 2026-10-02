@@ -1,4 +1,4 @@
-﻿// Postgres database setup, using a real persistent database (e.g. Neon)
+// Postgres database setup, using a real persistent database (e.g. Neon)
 // instead of the local SQLite file. This survives Render redeploys, unlike
 // SQLite on Render's free tier (whose disk is wiped on every deploy).
 
@@ -71,6 +71,13 @@ async function initSchema() {
       created_at TIMESTAMPTZ DEFAULT now()
     );
 
+    -- Where the charger physically is. The owner can update it from the
+    -- dashboard ("use my current location") whenever the charger is moved.
+    ALTER TABLE stations ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION;
+    ALTER TABLE stations ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION;
+    ALTER TABLE stations ADD COLUMN IF NOT EXISTS location_label TEXT;
+    ALTER TABLE stations ADD COLUMN IF NOT EXISTS location_updated_at TIMESTAMPTZ;
+
     CREATE INDEX IF NOT EXISTS idx_bookings_station ON bookings(station_id, slot_start);
     CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(user_id, slot_start);
     CREATE INDEX IF NOT EXISTS idx_telemetry_station ON telemetry(station_id, received_at);
@@ -83,4 +90,3 @@ function newApiKey() {
 }
 
 module.exports = { pool, initSchema, newApiKey };
-
