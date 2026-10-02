@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -8,15 +8,15 @@
 <style>
 .bookform{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
 @media(max-width:700px){.bookform{grid-template-columns:1fr 1fr}}
-.badge{padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600}
-.badge.booked{background:rgba(255,181,71,.15);color:var(--amber)}
-.badge.active{background:rgba(51,217,178,.15);color:var(--teal)}
-.badge.expired{background:rgba(255,97,97,.15);color:var(--red)}
-.badge.cancelled{background:rgba(138,151,161,.15);color:var(--muted)}
-.badge.completed{background:rgba(138,151,161,.15);color:var(--muted)}
-.rowbtn{padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);cursor:pointer;font-size:12.5px;margin-right:6px}
-.rowbtn.primary{background:var(--amber);color:#241300;border-color:var(--amber);font-weight:600}
-.rowbtn:hover{filter:brightness(1.1)}
+.badge{padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:600}
+.badge.booked{background:rgba(255,179,64,.14);color:var(--amber)}
+.badge.active{background:rgba(43,217,160,.14);color:var(--teal)}
+.badge.expired{background:rgba(255,93,93,.14);color:var(--red)}
+.badge.cancelled{background:rgba(124,138,150,.14);color:var(--muted)}
+.badge.completed{background:rgba(124,138,150,.14);color:var(--muted)}
+.rowbtn{padding:6px 13px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--text);cursor:pointer;font-size:12.5px;margin-right:6px;font-family:var(--font-ui);transition:filter .15s ease}
+.rowbtn.primary{background:var(--amber);color:#1c1000;border-color:var(--amber);font-weight:600}
+.rowbtn:hover{filter:brightness(1.12)}
 .sharebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .sharebox input{flex:1;min-width:220px;font-family:var(--font-num);font-size:12.5px}
 </style>
@@ -45,7 +45,7 @@
       <div><label for="time">Start time</label><input type="time" id="time"></div>
       <div>
         <label for="duration">Duration</label>
-        <select id="duration" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text)">
+        <select id="duration" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-family:var(--font-ui)">
           <option value="15">15 min</option>
           <option value="30" selected>30 min</option>
           <option value="45">45 min</option>
