@@ -6,19 +6,35 @@
 <title>Book a slot - NEW GEN EV</title>
 <link rel="stylesheet" href="/style.css">
 <style>
-.bookform{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
+.bookhead{padding:36px 0 28px;border-bottom:1px solid var(--line)}
+.bookhead h1{font-size:clamp(26px,3.4vw,34px);font-weight:800;letter-spacing:-.015em}
+.bookhead p.hint{margin-top:10px;max-width:520px}
+
+.bookform{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:18px;align-items:end;padding:28px 0;border-bottom:1px solid var(--line)}
 @media(max-width:700px){.bookform{grid-template-columns:1fr 1fr}}
-.badge{padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:600}
-.badge.booked{background:rgba(255,179,64,.14);color:var(--amber)}
-.badge.active{background:rgba(43,217,160,.14);color:var(--teal)}
-.badge.expired{background:rgba(255,93,93,.14);color:var(--red)}
-.badge.cancelled{background:rgba(124,138,150,.14);color:var(--muted)}
-.badge.completed{background:rgba(124,138,150,.14);color:var(--muted)}
-.rowbtn{padding:6px 13px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--panel-2);color:var(--text);cursor:pointer;font-size:12.5px;margin-right:6px;font-family:var(--font-ui);transition:filter .15s ease}
-.rowbtn.primary{background:var(--amber);color:#1c1000;border-color:var(--amber);font-weight:600}
-.rowbtn:hover{filter:brightness(1.12)}
-.sharebox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bookform label{margin-top:0}
+.bookform select{width:100%;padding:13px 14px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-family:var(--font-ui);font-size:14px}
+.bookform .btn{width:auto;margin-top:0;padding:13px 24px}
+
+.badge{padding:4px 12px;border-radius:999px;font-size:11.5px;font-weight:600}
+.badge.booked{background:rgba(255,178,63,.12);color:var(--amber)}
+.badge.active{background:rgba(61,220,132,.12);color:var(--teal)}
+.badge.expired{background:rgba(255,80,80,.12);color:var(--red)}
+.badge.cancelled{background:rgba(143,143,143,.12);color:var(--muted)}
+.badge.completed{background:rgba(143,143,143,.12);color:var(--muted)}
+.rowbtn{padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer;font-size:12.5px;margin-right:6px;font-family:var(--font-ui);transition:filter .15s ease,border-color .15s ease}
+.rowbtn.primary{background:var(--amber);color:#140a00;border-color:var(--amber);font-weight:700}
+.rowbtn:hover{border-color:var(--muted-2)}
+.rowbtn.primary:hover{filter:brightness(1.1);border-color:var(--amber)}
+
+.sharebox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:20px 0;border-top:1px solid var(--line)}
 .sharebox input{flex:1;min-width:220px;font-family:var(--font-num);font-size:12.5px}
+
+.howlist{border-top:1px solid var(--line);margin-top:8px}
+.howlist .row{display:grid;grid-template-columns:40px 1fr;gap:18px;padding:22px 0;border-bottom:1px solid var(--line)}
+.howlist .row .idx{font-family:var(--font-num);color:var(--muted-2);font-size:13px;padding-top:2px}
+.howlist .row h3{font-size:15px;font-weight:700;margin:0 0 5px}
+.howlist .row p{color:var(--muted);font-size:13.5px;line-height:1.6;max-width:520px;margin:0}
 </style>
 </head>
 <body>
@@ -29,42 +45,48 @@
       <a href="/dashboard.html">Dashboard</a>
       <a href="/history.html">History</a>
       <a href="/booking.html" class="active">Book a slot</a>
+      <a href="/about.html">About</a>
+      <a href="/goals.html">Goals</a>
       <span id="userChip" style="color:var(--text)"></span>
     </div>
     <button class="logout" onclick="Auth.logout()">Log out</button>
   </div>
 
-  <div class="section-title" style="margin-top:24px">Book a charging slot</div>
-  <p class="hint" id="stationLine">Loading station…</p>
-  <p class="hint" id="contactLine"></p>
-  <p class="hint">If you don't check in within <b id="graceMin">15</b> minutes of your slot's start time, it's automatically released for others.</p>
-
-  <div class="card" style="margin-top:12px">
-    <div class="bookform">
-      <div><label for="date">Date</label><input type="date" id="date"></div>
-      <div><label for="time">Start time</label><input type="time" id="time"></div>
-      <div>
-        <label for="duration">Duration</label>
-        <select id="duration" style="width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-family:var(--font-ui)">
-          <option value="15">15 min</option>
-          <option value="30" selected>30 min</option>
-          <option value="45">45 min</option>
-          <option value="60">60 min</option>
-          <option value="90">90 min</option>
-        </select>
-      </div>
-      <button class="btn" style="margin-top:0" onclick="book()">Book slot</button>
-    </div>
-    <div class="err" id="err" style="display:none;margin-top:14px"></div>
+  <div class="bookhead">
+    <h1>Book a charging slot</h1>
+    <p class="hint" id="stationLine">Loading station…</p>
+    <p class="hint" id="contactLine"></p>
+    <p class="hint">If you don't check in within <b id="graceMin">15</b> minutes of your slot's start time, it's released automatically for someone else.</p>
   </div>
 
+  <div class="bookform">
+    <div><label for="date">Date</label><input type="date" id="date"></div>
+    <div><label for="time">Start time</label><input type="time" id="time"></div>
+    <div>
+      <label for="duration">Duration</label>
+      <select id="duration">
+        <option value="15">15 min</option>
+        <option value="30" selected>30 min</option>
+        <option value="45">45 min</option>
+        <option value="60">60 min</option>
+        <option value="90">90 min</option>
+      </select>
+    </div>
+    <button class="btn" onclick="book()">Book slot</button>
+  </div>
+  <div class="err" id="err" style="display:none;margin-top:14px"></div>
+
   <div class="section-title">My bookings</div>
-  <div class="card" style="padding:6px 16px">
-    <table>
-      <thead><tr><th>Slot</th><th>Station</th><th>Status</th><th></th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="empty" id="emptyMsg" style="display:none">No bookings yet.</div>
+  <table>
+    <thead><tr><th>Slot</th><th>Station</th><th>Status</th><th></th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="empty" id="emptyMsg" style="display:none">No bookings yet — pick a date and time above to reserve your first slot.</div>
+
+  <div class="howlist" id="howSection">
+    <div class="row"><div class="idx">01</div><div><h3>Pick a time</h3><p>Choose a date, start time and how long you'll need — 15 minutes up to 90.</p></div></div>
+    <div class="row"><div class="idx">02</div><div><h3>Check in on arrival</h3><p>Tap your RFID card at the station within the 15-minute grace window to start charging on your slot.</p></div></div>
+    <div class="row"><div class="idx">03</div><div><h3>Miss it, lose it</h3><p>No check-in within the window and the slot is released automatically — fair access, no manual coordination.</p></div></div>
   </div>
 
   <div id="ownerSection" style="display:none">
@@ -82,19 +104,17 @@
 
     <div class="section-title">Share your booking link</div>
     <p class="hint">Send this link to customers so they can book a slot on your station specifically.</p>
-    <div class="card sharebox">
+    <div class="sharebox">
       <input type="text" id="shareLink" readonly>
       <button class="rowbtn" onclick="copyShareLink()">Copy</button>
     </div>
 
     <div class="section-title">Bookings on your station (all customers)</div>
-    <div class="card" style="padding:6px 16px">
-      <table>
-        <thead><tr><th>Customer</th><th>Slot</th><th>Status</th></tr></thead>
-        <tbody id="ownerRows"></tbody>
-      </table>
-      <div class="empty" id="ownerEmptyMsg" style="display:none">No customer bookings yet.</div>
-    </div>
+    <table>
+      <thead><tr><th>Customer</th><th>Slot</th><th>Status</th></tr></thead>
+      <tbody id="ownerRows"></tbody>
+    </table>
+    <div class="empty" id="ownerEmptyMsg" style="display:none">No customer bookings yet.</div>
   </div>
 </div>
 
