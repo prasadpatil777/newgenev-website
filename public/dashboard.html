@@ -198,8 +198,11 @@ async function refresh(){
     const dot = document.getElementById('statusDot');
     dot.className = 'pulse-dot' + (data.online ? '' : ' off');
 
+    // If the station hasn't sent anything in the last 10s (data.online is
+    // false), don't keep showing whatever state happened to be saved last
+    // time it was online — that's stale and misleading. Show OFFLINE instead.
     const t = data.latest;
-    document.getElementById('stateBig').textContent = t ? t.state : 'NO DATA YET';
+    document.getElementById('stateBig').textContent = !data.online ? 'OFFLINE' : (t ? t.state : 'NO DATA YET');
     document.getElementById('v').innerHTML = (t? t.voltage.toFixed(1):'0.0') + '<small>V</small>';
     document.getElementById('i').innerHTML = (t? t.current.toFixed(3):'0.000') + '<small>A</small>';
     document.getElementById('p').innerHTML = (t? t.power.toFixed(1):'0.0') + '<small>W</small>';
