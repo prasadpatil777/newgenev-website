@@ -133,16 +133,6 @@ initAboutLink();
   }
 })();
 
-// Quiet full-page background glow (sits behind all content). Kept deliberately
-// restrained — a single soft radial wash, no grid lines, no floating icons —
-// so the black surface reads as premium rather than decorated.
-(function initBackgroundArt(){
-  if(document.getElementById('bgArt')) return;
-  const div = document.createElement('div');
-  div.id = 'bgArt';
-  div.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:'
-    + 'radial-gradient(60% 40% at 85% -5%, rgba(255,178,63,.07), transparent 60%),'
-    + 'radial-gradient(50% 35% at 5% 100%, rgba(61,220,132,.05), transparent 60%),'
-    + '#000000;';
-  document.body.prepend(div);
-})();
+// The color glow now lives directly on body{} in style.css (richer, three-tone
+// wash), so no extra background layer is injected here — one source of truth,
+// no double-stacked gradients.
