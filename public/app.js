@@ -1,4 +1,4 @@
-﻿const Auth = {
+const Auth = {
   getToken(){ return localStorage.getItem('ev_token'); },
   setSession(token, user){
     localStorage.setItem('ev_token', token);
@@ -123,7 +123,7 @@ initAboutLink();
 
   const themeMeta = document.createElement('meta');
   themeMeta.name = 'theme-color';
-  themeMeta.content = '#12161a';
+  themeMeta.content = '#0b0f14';
   document.head.appendChild(themeMeta);
 
   if('serviceWorker' in navigator){
@@ -199,4 +199,3 @@ initAboutLink();
     <div style="color:#33d9b2;font-size:10.5px;letter-spacing:1.5px;margin-top:3px">CLEAN ENERGY &middot; SMART CHARGING &middot; FUTURE READY</div>`;
   document.body.prepend(tagline);
 })();
-
