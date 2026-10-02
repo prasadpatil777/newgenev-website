@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const { pool } = require('../db/init');
 const { requireUser } = require('../middleware/auth');
 
@@ -47,10 +47,23 @@ router.post('/sessions', stationByApiKey, async (req, res) => {
   res.json({ ok: true });
 });
 
+// Every registered account (owner or customer) gets its own station row
+// created at signup, each with its own API key - but only ONE of those
+// stations actually has real ESP32 hardware wired to it. A customer's own
+// station never receives telemetry, so showing "your own station" to a
+// logged-in customer always reads OFFLINE no matter what the real charger
+// is doing. Instead, /live and /live/history always show the one shared
+// "main" station (the same station booking.html defaults everyone to),
+// so every logged-in user - owner or customer - sees the same real
+// charger's live status.
+async function getMainStation() {
+  const result = await pool.query('SELECT * FROM stations ORDER BY id LIMIT 1');
+  return result.rows[0];
+}
+
 router.get('/live', requireUser, async (req, res) => {
-  const stationResult = await pool.query('SELECT * FROM stations WHERE user_id = $1 ORDER BY id LIMIT 1', [req.userId]);
-  const station = stationResult.rows[0];
-  if (!station) return res.status(404).json({ error: 'no station found for this account' });
+  const station = await getMainStation();
+  if (!station) return res.status(404).json({ error: 'no station found' });
 
   const latestResult = await pool.query('SELECT * FROM telemetry WHERE station_id = $1 ORDER BY id DESC LIMIT 1', [station.id]);
   const latest = latestResult.rows[0];
@@ -60,9 +73,8 @@ router.get('/live', requireUser, async (req, res) => {
 });
 
 router.get('/live/history', requireUser, async (req, res) => {
-  const stationResult = await pool.query('SELECT * FROM stations WHERE user_id = $1 ORDER BY id LIMIT 1', [req.userId]);
-  const station = stationResult.rows[0];
-  if (!station) return res.status(404).json({ error: 'no station found for this account' });
+  const station = await getMainStation();
+  if (!station) return res.status(404).json({ error: 'no station found' });
 
   const rowsResult = await pool.query(
     'SELECT power, voltage, current, received_at FROM telemetry WHERE station_id = $1 ORDER BY id DESC LIMIT 30',
@@ -72,4 +84,3 @@ router.get('/live/history', requireUser, async (req, res) => {
 });
 
 module.exports = router;
-
