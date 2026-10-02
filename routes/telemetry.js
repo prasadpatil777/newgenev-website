@@ -1,42 +1,78 @@
 const express = require('express');
 const { pool } = require('../db/init');
-const { requireUser } = require('../middleware/auth');
+const jwt = require('jsonwebtoken');
+const { requireUser, JWT_SECRET } = require('../middleware/auth');
 
 const router = express.Router();
 
+// ---------- Live push (Server-Sent Events) ----------
+// The newest reading of each station is kept in memory and pushed to every
+// open dashboard the moment the ESP32 posts it - no waiting for the next
+// poll, and no database round-trip on the hot path.
+const liveLatest = new Map();      // stationId -> { row, receivedAtMs }
+const streamClients = new Set();   // { res, userId }
+const ONLINE_WINDOW_MS = 3000;
+
+const stationKeyCache = new Map();   // api_key -> { station, at }
 async function stationByApiKey(req, res, next) {
   const key = req.headers['x-station-key'];
   if (!key) return res.status(401).json({ error: 'missing X-Station-Key header' });
+  const cached = stationKeyCache.get(key);
+  if (cached && Date.now() - cached.at < 60000) { req.station = cached.station; return next(); }
   const result = await pool.query('SELECT * FROM stations WHERE api_key = $1', [key]);
   if (!result.rows[0]) return res.status(401).json({ error: 'invalid station API key' });
+  stationKeyCache.set(key, { station: result.rows[0], at: Date.now() });
   req.station = result.rows[0];
   next();
 }
 
 router.post('/telemetry', stationByApiKey, async (req, res) => {
   const b = req.body || {};
+  const row = {
+    station_id: req.station.id, state: b.state || 'UNKNOWN', relay: b.relay ? 1 : 0,
+    meter_online: b.meter ? 1 : 0, dht_online: b.dht ? 1 : 0,
+    voltage: Number(b.v) || 0, current: Number(b.i) || 0, power: Number(b.p) || 0,
+    pf: Number(b.pf) || 0, hz: Number(b.hz) || 0, kwh: Number(b.kwh) || 0,
+    session_wh: Number(b.sessionWh) || 0, temp: Number(b.temp) || 0, hum: Number(b.hum) || 0,
+    time_sec: Number(b.time) || 0, emergency: b.emg ? 1 : 0,
+    received_at: new Date().toISOString()
+  };
+  liveLatest.set(req.station.id, { row, receivedAtMs: Date.now() });
+  pushToStreams(req.station.id);      // dashboards update right now
+  res.json({ ok: true });             // ESP32 doesn't wait for the database
+
+  try {
+    await saveTelemetry(req.station, b);
+  } catch (e) {
+    console.error('telemetry save failed:', e.message);
+  }
+});
+
+let telemetryCount = 0;
+async function saveTelemetry(station, b) {
   await pool.query(
     `INSERT INTO telemetry
       (station_id, state, relay, meter_online, dht_online, voltage, current, power, pf, hz,
        kwh, session_wh, temp, hum, time_sec, emergency)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
     [
-      req.station.id, b.state || 'UNKNOWN', b.relay ? 1 : 0, b.meter ? 1 : 0, b.dht ? 1 : 0,
+      station.id, b.state || 'UNKNOWN', b.relay ? 1 : 0, b.meter ? 1 : 0, b.dht ? 1 : 0,
       Number(b.v) || 0, Number(b.i) || 0, Number(b.p) || 0, Number(b.pf) || 0, Number(b.hz) || 0,
       Number(b.kwh) || 0, Number(b.sessionWh) || 0, Number(b.temp) || 0, Number(b.hum) || 0,
       Number(b.time) || 0, b.emg ? 1 : 0
     ]
   );
 
-  await pool.query(
-    `DELETE FROM telemetry WHERE station_id = $1 AND id NOT IN (
-      SELECT id FROM telemetry WHERE station_id = $1 ORDER BY id DESC LIMIT 500
-    )`,
-    [req.station.id]
-  );
-
-  res.json({ ok: true });
-});
+  // Trim old rows now and then (not on every 0.5 s post).
+  if (++telemetryCount % 20 === 0) {
+    await pool.query(
+      `DELETE FROM telemetry WHERE station_id = $1 AND id NOT IN (
+        SELECT id FROM telemetry WHERE station_id = $1 ORDER BY id DESC LIMIT 500
+      )`,
+      [station.id]
+    );
+  }
+}
 
 router.post('/sessions', stationByApiKey, async (req, res) => {
   const b = req.body || {};
@@ -65,18 +101,86 @@ router.get('/live', requireUser, async (req, res) => {
   const station = await getMainStation();
   if (!station) return res.status(404).json({ error: 'no station found' });
 
-  const latestResult = await pool.query('SELECT * FROM telemetry WHERE station_id = $1 ORDER BY id DESC LIMIT 1', [station.id]);
-  const latest = latestResult.rows[0];
-  const isOnline = latest && (Date.now() - new Date(latest.received_at).getTime()) < 3000;
-
-  res.json({
-    station: { id: station.id, name: station.name },
-    online: !!isOnline,
-    latest: latest || null,
-    location: stationLocation(station),
-    isOwner: station.user_id === req.userId
-  });
+  let mem = liveLatest.get(station.id);
+  if (!mem) {
+    const latestResult = await pool.query('SELECT * FROM telemetry WHERE station_id = $1 ORDER BY id DESC LIMIT 1', [station.id]);
+    const r = latestResult.rows[0];
+    if (r) mem = { row: r, receivedAtMs: new Date(r.received_at).getTime() };
+  }
+  res.json(livePayload(station, mem, req.userId));
 });
+
+function livePayload(station, mem, userId) {
+  const ageMs = mem ? Date.now() - mem.receivedAtMs : null;
+  return {
+    station: { id: station.id, name: station.name },
+    online: ageMs !== null && ageMs < ONLINE_WINDOW_MS,
+    latest: mem ? mem.row : null,
+    ageMs,                      // how old "latest" is - lets the timer stay exact
+    location: stationLocation(station),
+    isOwner: station.user_id === userId
+  };
+}
+
+// Main station row, cached briefly so pushes don't hit the database.
+let mainStationCache = null, mainStationAt = 0;
+async function getMainStationCached() {
+  if (!mainStationCache || Date.now() - mainStationAt > 30000) {
+    mainStationCache = await getMainStation();
+    mainStationAt = Date.now();
+  }
+  return mainStationCache;
+}
+
+async function pushToStreams(stationId) {
+  if (!streamClients.size) return;
+  let station;
+  try { station = await getMainStationCached(); } catch (e) { return; }
+  if (!station || station.id !== stationId) return;
+  const mem = liveLatest.get(station.id);
+  for (const c of streamClients) {
+    c.res.write('data: ' + JSON.stringify(livePayload(station, mem, c.userId)) + '\n\n');
+  }
+}
+
+// EventSource can't send an Authorization header, so the token comes in the URL.
+router.get('/live/stream', async (req, res) => {
+  let userId;
+  try { userId = jwt.verify(String(req.query.token || ''), JWT_SECRET).userId; }
+  catch (e) { return res.status(401).json({ error: 'invalid or expired token' }); }
+
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no'
+  });
+  res.flushHeaders();
+  res.write('retry: 2000\n\n');
+
+  const client = { res, userId };
+  streamClients.add(client);
+  try {
+    const station = await getMainStationCached();
+    if (station) res.write('data: ' + JSON.stringify(livePayload(station, liveLatest.get(station.id), userId)) + '\n\n');
+  } catch (e) {}
+  req.on('close', () => streamClients.delete(client));
+});
+
+// Once a second: keep connections alive and let dashboards flip to OFFLINE
+// when the charger stops posting.
+setInterval(async () => {
+  if (!streamClients.size) return;
+  let station;
+  try { station = await getMainStationCached(); } catch (e) { return; }
+  if (!station) return;
+  const mem = liveLatest.get(station.id);
+  const fresh = mem && Date.now() - mem.receivedAtMs < 900;
+  for (const c of streamClients) {
+    if (fresh) c.res.write(': ping\n\n');
+    else c.res.write('data: ' + JSON.stringify(livePayload(station, mem, c.userId)) + '\n\n');
+  }
+}, 1000);
 
 // Default spot until the owner sets one from the dashboard.
 const DEFAULT_LOCATION = { lat: 21.005417, lng: 75.573682, label: 'NEW GEN EV Charging Station' };
@@ -110,6 +214,8 @@ router.post('/stations/location', requireUser, async (req, res) => {
      WHERE id = $4 RETURNING *`,
     [lat, lng, label, station.id]
   );
+  mainStationCache = result.rows[0]; mainStationAt = Date.now();
+  pushToStreams(station.id);
   res.json({ ok: true, location: stationLocation(result.rows[0]) });
 });
 
