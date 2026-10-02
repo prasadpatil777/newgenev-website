@@ -6,31 +6,22 @@
 <title>Our Goals - NEW GEN EV</title>
 <link rel="stylesheet" href="/style.css">
 <style>
-.goalgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
+.goalgrid{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);margin-top:24px}
 @media(max-width:700px){.goalgrid{grid-template-columns:1fr}}
-.goalcard{position:relative;background:var(--panel);border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:22px 22px 22px 24px;overflow:hidden;transition:border-color .15s ease,background .15s ease}
-.goalcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--amber),rgba(255,179,64,.15))}
-.goalcard:nth-child(2)::before{background:linear-gradient(180deg,var(--blue),rgba(91,157,255,.15))}
-.goalcard:nth-child(3)::before{background:linear-gradient(180deg,var(--red),rgba(255,93,93,.15))}
-.goalcard:nth-child(4)::before{background:linear-gradient(180deg,var(--teal),rgba(43,217,160,.15))}
-.goalcard:nth-child(5)::before{background:linear-gradient(180deg,var(--blue),rgba(91,157,255,.15))}
-.goalcard:nth-child(6)::before{background:linear-gradient(180deg,var(--teal),rgba(43,217,160,.15))}
-.goalcard:hover{border-color:var(--line);background:var(--panel-2)}
-.goalicon{width:32px;height:32px;color:var(--text);margin-bottom:14px}
+.goalcard{position:relative;background:transparent;border-left:1px solid var(--line);border-bottom:1px solid var(--line);padding:28px 26px;transition:background .15s ease}
+.goalcard:nth-child(2n+1){border-left:none}
+@media(max-width:700px){.goalcard{border-left:none}}
+.goalcard:hover{background:var(--panel)}
+.goalicon{width:26px;height:26px;color:var(--amber);margin-bottom:18px}
 .goalicon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.6}
-.goalcard h3{margin:0 0 8px;font-size:15.5px;font-weight:600;font-family:var(--font-ui)}
+.goalcard h3{margin:0 0 8px;font-size:16px;font-weight:700;font-family:var(--font-ui)}
 .goalcard p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.65}
 
-.missionband{
-  position:relative;overflow:hidden;
-  background: linear-gradient(160deg, var(--panel-2), var(--panel));
-  border:1px solid var(--line-soft); border-radius:var(--radius-lg); padding:34px 30px; margin-top:24px; text-align:center;
-}
-.missionband::before{content:'';position:absolute;inset:0;background:radial-gradient(60% 100% at 50% 0%, rgba(255,179,64,.08), transparent 70%)}
-.missionband .eyebrow{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--teal);font-weight:500;position:relative}
-.missionband .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 3px rgba(43,217,160,.18)}
-.missionband h2{font-family:var(--font-display);font-weight:600;font-size:23px;margin:12px 0 0;position:relative}
-.missionband p{max-width:600px;margin:12px auto 0;color:var(--muted);font-size:14.5px;line-height:1.7;position:relative}
+.missionband{padding:48px 0 44px; margin-top:8px; text-align:center;border-bottom:1px solid var(--line)}
+.missionband .eyebrow{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--teal);font-weight:600}
+.missionband .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--teal)}
+.missionband h2{font-family:var(--font-display);font-weight:800;font-size:clamp(26px,3.6vw,38px);margin:16px 0 0;letter-spacing:-.02em}
+.missionband p{max-width:600px;margin:16px auto 0;color:var(--muted);font-size:15.5px;line-height:1.7}
 </style>
 </head>
 <body>
