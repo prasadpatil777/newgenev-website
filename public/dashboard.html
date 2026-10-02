@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard - NEW GEN EV</title>
 <link rel="stylesheet" href="/style.css">
+<style>
+.loccard{margin-top:16px;padding:20px}
+.loccard::before{background:var(--teal)}
+.lochead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.locname{font-family:var(--font-display);font-size:18px;font-weight:700}
+.mapbox{margin-top:14px;border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;height:320px;background:var(--panel-2)}
+.mapbox iframe{width:100%;height:100%;border:0;display:block}
+.locbtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.locbtn{padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--text);font:600 13.5px var(--font-ui);text-decoration:none;cursor:pointer}
+.locbtn:hover{border-color:var(--muted-2)}
+.locbtn.primary{background:var(--amber);border-color:var(--amber);color:#fff}
+.locbtn:disabled{opacity:.6;cursor:wait}
+@media(max-width:600px){.mapbox{height:240px}}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -60,6 +74,23 @@
     <div class="lbl" style="margin-bottom:10px"><svg class="icon" viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 8-9"/></svg>Power over recent readings</div>
     <canvas id="chart" width="900" height="140"></canvas>
     <div class="chart-empty" id="chartEmpty" style="display:none">No data yet — waiting for the station.</div>
+  </div>
+
+  <div class="card loccard">
+    <div class="lochead">
+      <div>
+        <div class="lbl" style="margin-bottom:4px"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>Charger location</div>
+        <div class="locname" id="locName">Loading…</div>
+        <div class="hint" id="locMeta" style="margin-top:2px"></div>
+      </div>
+      <span class="pill offline" id="locStatus">OFFLINE</span>
+    </div>
+    <div class="mapbox"><iframe id="locMap" title="Charger location map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+    <div class="locbtns">
+      <a class="locbtn primary" id="locDirections" href="#" target="_blank" rel="noopener">Get directions</a>
+      <button class="locbtn" id="locUpdate" type="button" style="display:none">Update to my current location</button>
+    </div>
+    <div class="hint" id="locMsg"></div>
   </div>
 
   <div class="section-title">Your station's API key</div>
@@ -160,6 +191,7 @@ async function refresh(){
     const dot = document.getElementById('statusDot');
     dot.className = 'pulse-dot' + (data.online ? '' : ' off');
     if(data.station) document.getElementById('stationName').textContent = data.station.name;
+    paintLocation(data);
 
     // If the station hasn't sent anything in the last 10s (data.online is
     // false), don't keep showing whatever state happened to be saved last
@@ -187,6 +219,49 @@ async function refresh(){
     console.error(e);
   }
 }
+
+// ---- Charger location map ----
+// The map iframe is only reloaded when the coordinates actually change, not
+// on every 1-second refresh.
+let shownLoc = '';
+function paintLocation(data){
+  const loc = data.location;
+  if(!loc) return;
+  const st = document.getElementById('locStatus');
+  st.textContent = data.online ? 'ONLINE' : 'OFFLINE';
+  st.className = 'pill ' + (data.online ? 'online' : 'offline');
+  document.getElementById('locName').textContent = loc.label;
+  document.getElementById('locMeta').textContent =
+    loc.lat.toFixed(5) + ', ' + loc.lng.toFixed(5) +
+    (loc.updatedAt ? ' · updated ' + new Date(loc.updatedAt).toLocaleString() : '');
+  document.getElementById('locUpdate').style.display = data.isOwner ? 'inline-block' : 'none';
+  const key = loc.lat + ',' + loc.lng;
+  if(key !== shownLoc){
+    shownLoc = key;
+    document.getElementById('locMap').src = 'https://maps.google.com/maps?q=' + key + '&z=16&output=embed';
+    document.getElementById('locDirections').href = 'https://www.google.com/maps/dir/?api=1&destination=' + key;
+  }
+}
+
+document.getElementById('locUpdate').addEventListener('click', ()=>{
+  const btn = document.getElementById('locUpdate');
+  const msg = document.getElementById('locMsg');
+  if(!navigator.geolocation){ msg.textContent = 'This browser cannot share its location.'; return; }
+  const label = prompt('Name for this location (e.g. "College campus, Block A"):', document.getElementById('locName').textContent);
+  if(label === null) return;
+  btn.disabled = true; msg.textContent = 'Getting your location…';
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    try{
+      await api('/stations/location', {method:'POST', body: JSON.stringify({lat: pos.coords.latitude, lng: pos.coords.longitude, label})});
+      msg.textContent = 'Location updated. Everyone now sees the charger here.';
+      refresh();
+    }catch(e){ msg.textContent = 'Could not save: ' + e.message; }
+    btn.disabled = false;
+  }, err=>{
+    msg.textContent = 'Location permission denied or unavailable. Allow location access and try again.';
+    btn.disabled = false;
+  }, {enableHighAccuracy:true, timeout:15000});
+});
 
 async function refreshChart(){
   try{
