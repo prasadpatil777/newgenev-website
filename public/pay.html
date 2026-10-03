@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pay & Charge - NEW GEN EV</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.paywrap{max-width:560px;margin:0 auto}
+.payhead{padding:30px 0 18px;text-align:center}
+.payhead h1{font-size:clamp(28px,6vw,38px);font-weight:900;letter-spacing:-.02em}
+.payhead p{color:var(--muted);margin:10px auto 0;max-width:420px;line-height:1.55}
+.pcard{padding:22px !important;margin-top:14px}
+.chstate{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.chstate b{font-family:var(--font-display);font-size:22px}
+.amts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.amt{padding:16px 6px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#fff;font:800 18px var(--font-num);cursor:pointer;transition:box-shadow .2s ease,border-color .2s ease,transform .15s ease}
+.amt small{display:block;font:500 11.5px var(--font-ui);color:var(--muted);margin-top:4px}
+.amt.sel{border-color:#ffb23f;box-shadow:0 0 22px -4px rgba(255,122,26,.8);transform:translateY(-2px)}
+.custom{display:flex;gap:10px;align-items:center;margin-top:12px}
+.custom input{flex:1}
+.est{margin-top:12px;color:#c9c3d8;font-size:14px}
+.qrbox{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+#qr{background:#fff;padding:14px;border-radius:16px;box-shadow:0 0 40px -8px rgba(255,178,63,.7)}
+#qr img,#qr canvas{display:block}
+.payamt{font-family:var(--font-num);font-size:40px;font-weight:800;color:#fff;text-shadow:0 0 22px rgba(255,178,63,.6)}
+.exact{color:#ffd9a0;font-size:13.5px}
+.applink{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:999px;text-decoration:none;font-weight:800;color:#170900;
+  background:linear-gradient(110deg,#ffcb6b,#ff7a1a 50%,#ff4fa3);box-shadow:0 12px 30px -10px rgba(255,122,26,.9)}
+.statusline{display:flex;align-items:center;gap:10px;justify-content:center;font-weight:700;font-size:16px}
+.spin{width:16px;height:16px;border-radius:50%;border:3px solid rgba(255,178,63,.25);border-top-color:#ffb23f;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.prog{height:14px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:12px}
+.prog i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#3ddc84,#22d3ee);box-shadow:0 0 18px #3ddc84;transition:width .6s ease}
+.small{color:var(--muted);font-size:13px}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:500 13px var(--font-ui)}
+.bigok{font-size:46px;line-height:1}
+[hidden]{display:none !important}
+</style>
+<link rel="stylesheet" href="/fx.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="bolt">⚡</div>NEW GEN EV</div>
+    <div class="navlinks"><a href="/pay.html" class="active">Pay &amp; Charge</a><a href="/login.html">Owner login</a></div>
+  </div>
+
+  <div class="paywrap">
+    <div class="payhead">
+      <h1>Pay &amp; Charge</h1>
+      <p>Pay with PhonePe, Google Pay or Paytm. Charging starts by itself once your payment is received, and stops when your amount is used.</p>
+    </div>
+
+    <div class="card pcard">
+      <div class="chstate"><span class="small">Charger</span><span class="pill offline" id="pill">OFFLINE</span></div>
+      <div class="chstate" style="margin-top:6px"><b id="stName">NEW GEN EV</b><b id="stState" style="font-size:16px;color:var(--muted)">…</b></div>
+    </div>
+
+    <!-- step 1: choose amount -->
+    <div class="card pcard" id="stepAmount">
+      <div class="lbl">1. Choose amount</div>
+      <div class="amts" id="amts"></div>
+      <div class="custom"><input type="number" id="customAmt" inputmode="numeric" min="10" max="500" placeholder="Other amount (₹10–500)"></div>
+      <div class="est" id="est">Rate ₹23 per unit (kWh).</div>
+      <button class="btn" id="payBtn" disabled>Continue to pay</button>
+      <div class="err" id="err"></div>
+    </div>
+
+    <!-- step 2: pay -->
+    <div class="card pcard" id="stepPay" hidden>
+      <div class="qrbox">
+        <div class="lbl">2. Scan &amp; pay this exact amount</div>
+        <div class="payamt" id="payAmt">₹0.00</div>
+        <div class="exact">Please pay exactly this amount (with paise) so we can match your payment.</div>
+        <div id="qr"></div>
+        <a class="applink" id="appLink" href="#">Open UPI app to pay</a>
+        <div class="small">Paying to <b id="payee">Prasad Patil</b> · order #<span id="orderNo"></span> · expires in <span id="timer">10:00</span></div>
+        <div class="statusline" id="waitLine"><span class="spin"></span><span>Waiting for payment…</span></div>
+        <button class="linkbtn" id="cancelBtn">Cancel</button>
+      </div>
+    </div>
+
+    <!-- step 3: charging -->
+    <div class="card pcard" id="stepCharge" hidden>
+      <div class="qrbox">
+        <div class="bigok" id="chIcon">⚡</div>
+        <div class="statusline" id="chTitle">Payment received ✓</div>
+        <div class="small" id="chSub">Starting the charger…</div>
+        <div style="width:100%">
+          <div class="prog"><i id="progBar"></i></div>
+          <div class="chstate" style="margin-top:8px"><span class="small">Used <b id="usedAmt">₹0</b></span><span class="small">Paid <b id="paidAmt">₹0</b></span></div>
+        </div>
+        <button class="linkbtn" id="newBtn" hidden>Start a new payment</button>
+      </div>
+    </div>
+
+    <p class="small" style="text-align:center;margin:22px 0 40px">Problem with a payment? Call the station owner: <b>+91 74107 22330</b></p>
+  </div>
+</div>
+<script src="/qrcode.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const AMOUNTS = [10, 20, 50, 100];
+let info = null, chosen = 0, order = null, poll = 0, tick = 0;
+
+function store(o){ try{ if(o) localStorage.setItem('ngev_pay', JSON.stringify({id:o.id, token:o.token})); else localStorage.removeItem('ngev_pay'); }catch(e){} }
+function stored(){ try{ return JSON.parse(localStorage.getItem('ngev_pay')||'null'); }catch(e){ return null; } }
+
+async function j(url, opts){
+  const r = await fetch(url, Object.assign({headers:{'Content-Type':'application/json'}}, opts||{}));
+  const d = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error || 'Something went wrong');
+  return d;
+}
+
+function show(step){ ['stepAmount','stepPay','stepCharge'].forEach(s => $(s).hidden = s !== step); }
+
+function paintCharger(c){
+  $('pill').textContent = c.online ? 'ONLINE' : 'OFFLINE';
+  $('pill').className = 'pill ' + (c.online ? 'online' : 'offline');
+  $('stState').textContent = c.state;
+}
+
+function renderAmounts(){
+  $('amts').innerHTML = AMOUNTS.map(a => `<button class="amt" data-a="${a}">₹${a}<small>${(a/23).toFixed(2)} kWh</small></button>`).join('');
+  $('amts').querySelectorAll('.amt').forEach(b => b.onclick = () => { $('customAmt').value=''; choose(Number(b.dataset.a)); });
+}
+function choose(a){
+  chosen = a;
+  $('amts').querySelectorAll('.amt').forEach(b => b.classList.toggle('sel', Number(b.dataset.a) === a));
+  $('est').textContent = a ? `₹${a} ≈ ${(a/23).toFixed(2)} kWh at ₹23 per unit.` : 'Rate ₹23 per unit (kWh).';
+  updateBtn();
+}
+function updateBtn(){
+  const ok = info && info.available && chosen >= info.minAmount && chosen <= info.maxAmount;
+  $('payBtn').disabled = !ok;
+  $('payBtn').textContent = chosen ? `Continue to pay ₹${chosen}` : 'Continue to pay';
+  const e = $('err');
+  if(info && !info.available){ e.textContent = info.reason; e.style.display = 'block'; }
+  else e.style.display = 'none';
+}
+$('customAmt').oninput = () => choose(Math.round(Number($('customAmt').value)) || 0);
+
+async function loadInfo(){
+  try{ info = await j('/api/pay/info'); paintCharger(info.charger); $('stName').textContent = info.station.name; updateBtn(); }catch(e){}
+}
+
+$('payBtn').onclick = async () => {
+  $('payBtn').disabled = true;
+  try{
+    order = await j('/api/pay/order', {method:'POST', body: JSON.stringify({amount: chosen})});
+    store(order); openPay(order);
+  }catch(e){ const er=$('err'); er.textContent = e.message; er.style.display='block'; updateBtn(); }
+};
+
+function openPay(o){
+  show('stepPay');
+  $('payAmt').textContent = '₹' + o.payAmount.toFixed(2);
+  $('orderNo').textContent = o.id; $('payee').textContent = o.upiName;
+  $('appLink').href = o.upi;
+  $('qr').innerHTML = '';
+  new QRCode($('qr'), {text:o.upi, width:220, height:220, colorDark:'#000000', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.M});
+  startPolling();
+}
+
+function startPolling(){
+  clearInterval(poll); clearInterval(tick);
+  poll = setInterval(refresh, 2000); refresh();
+  tick = setInterval(() => {
+    if(!order) return;
+    const s = Math.max(0, Math.floor((new Date(order.expiresAt) - Date.now())/1000));
+    $('timer').textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+  }, 1000);
+}
+
+async function refresh(){
+  const st = stored(); if(!st) return;
+  let o;
+  try{ o = await j(`/api/pay/order/${st.id}?token=${st.token}`); }catch(e){ return; }
+  order = Object.assign(order||{}, o);
+  paintCharger(o.charger);
+  if(o.status === 'waiting'){ if($('stepPay').hidden) openPay(order); return; }
+  if(o.status === 'expired' || o.status === 'cancelled'){ finish(); show('stepAmount'); const e=$('err'); e.textContent = o.status === 'expired' ? 'Payment time ran out. If you already paid, please call the owner.' : 'Payment cancelled.'; e.style.display='block'; loadInfo(); return; }
+  show('stepCharge');
+  $('paidAmt').textContent = '₹' + o.baseAmount;
+  const used = Math.min(o.used || 0, o.baseAmount);
+  $('usedAmt').textContent = '₹' + used.toFixed(2);
+  $('progBar').style.width = Math.round(used / o.baseAmount * 100) + '%';
+  if(o.status === 'paid'){ $('chIcon').textContent='✓'; $('chTitle').textContent = 'Payment received ✓'; $('chSub').textContent = 'Starting the charger…'; }
+  else if(o.status === 'charging'){ $('chIcon').textContent='⚡'; $('chTitle').textContent = 'Charging'; $('chSub').textContent = 'It will stop by itself when your ₹' + o.baseAmount + ' is used.'; }
+  else if(o.status === 'done'){ $('chIcon').textContent='✅'; $('chTitle').textContent = 'Charging complete'; $('chSub').textContent = 'Thank you for charging with NEW GEN EV!'; $('progBar').style.width = '100%'; finish(); $('newBtn').hidden = false; }
+  else if(o.status === 'failed_start'){ $('chIcon').textContent='⚠'; $('chTitle').textContent = 'Could not start the charger'; $('chSub').textContent = 'Your payment was received. Please call the owner at +91 74107 22330 for a refund or a manual start.'; finish(); $('newBtn').hidden = false; }
+}
+function finish(){ clearInterval(poll); clearInterval(tick); store(null); }
+
+$('cancelBtn').onclick = async () => {
+  const st = stored(); if(!st) return;
+  try{ await j(`/api/pay/order/${st.id}/cancel`, {method:'POST', body: JSON.stringify({token: st.token})}); }catch(e){}
+  finish(); order = null; show('stepAmount'); loadInfo();
+};
+$('newBtn').onclick = () => { order = null; $('newBtn').hidden = true; show('stepAmount'); choose(0); loadInfo(); };
+
+renderAmounts(); loadInfo(); setInterval(() => { if(!$('stepAmount').hidden) loadInfo(); }, 3000);
+if(stored()){ startPolling(); }
+</script>
+<script src="/fx.js" defer></script>
+</body>
+</html>

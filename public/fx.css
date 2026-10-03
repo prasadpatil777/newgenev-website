@@ -348,3 +348,10 @@ footer.site{border-top:1px solid rgba(255,255,255,.08) !important;background:lin
   *,*::before,*::after{animation:none !important;transition:none !important}
   #fx-canvas{display:none}
 }
+
+/* nav: many links now - keep each on one line, wrap as a group on mid-size screens */
+@media (min-width:701px){
+  .navlinks{gap:16px !important;flex-wrap:wrap;justify-content:center;row-gap:6px}
+  .navlinks a,.navlinks span{white-space:nowrap}
+  .brand{white-space:nowrap}
+}

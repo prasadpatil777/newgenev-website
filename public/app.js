@@ -96,6 +96,14 @@ function initAboutLink(){
     if(userChip) nav.insertBefore(link3, userChip); else nav.appendChild(link3);
   }
 
+  if(!nav.querySelector('a[href="/pay.html"]')){
+    const linkPay = document.createElement('a');
+    linkPay.href = '/pay.html';
+    linkPay.textContent = 'Pay & Charge';
+    if(location.pathname === '/pay.html') linkPay.className = 'active';
+    if(userChip) nav.insertBefore(linkPay, userChip); else nav.appendChild(linkPay);
+  }
+
   if(!nav.querySelector('a[href="/demo.html"]')){
     const link4 = document.createElement('a');
     link4.href = '/demo.html';

@@ -78,6 +78,26 @@ async function initSchema() {
     ALTER TABLE stations ADD COLUMN IF NOT EXISTS location_label TEXT;
     ALTER TABLE stations ADD COLUMN IF NOT EXISTS location_updated_at TIMESTAMPTZ;
 
+    -- Pay & Charge: customer pays the owner's UPI QR, charging starts after the
+    -- payment is confirmed (automatically from the owner's phone notification,
+    -- or by the owner with one tap) and stops when the paid amount is used.
+    CREATE TABLE IF NOT EXISTS payments (
+      id SERIAL PRIMARY KEY,
+      station_id INTEGER NOT NULL REFERENCES stations(id),
+      base_amount NUMERIC(8,2) NOT NULL,
+      pay_amount NUMERIC(8,2) NOT NULL,
+      token TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'waiting',
+      source TEXT,
+      final_bill REAL,
+      created_at TIMESTAMPTZ DEFAULT now(),
+      paid_at TIMESTAMPTZ,
+      started_at TIMESTAMPTZ,
+      ended_at TIMESTAMPTZ
+    );
+    ALTER TABLE stations ADD COLUMN IF NOT EXISTS notify_key TEXT;
+    CREATE INDEX IF NOT EXISTS idx_payments_station ON payments(station_id, created_at);
+
     CREATE INDEX IF NOT EXISTS idx_bookings_station ON bookings(station_id, slot_start);
     CREATE INDEX IF NOT EXISTS idx_bookings_user ON bookings(user_id, slot_start);
     CREATE INDEX IF NOT EXISTS idx_telemetry_station ON telemetry(station_id, received_at);

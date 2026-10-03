@@ -40,6 +40,16 @@
 .steps li b.n{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-num);background:rgba(255,178,63,.12);border:1px solid rgba(255,178,63,.45);color:#ffb23f}
 .offlinebox{margin-top:16px;font-size:13.5px;color:var(--muted);line-height:1.6}
 .offlinebox code{font-size:12.5px}
+.paygrid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:14px}
+@media(max-width:820px){.paygrid{grid-template-columns:1fr}}
+.orow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.orow:last-child{border-bottom:0}
+.orow b{font-family:var(--font-num)}
+.ost{font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid currentColor;margin-left:6px}
+.ost.waiting{color:#ffb23f}.ost.paid,.ost.charging{color:#3ddc84}.ost.done{color:#9fe8ff}.ost.expired,.ost.cancelled,.ost.failed_start{color:#ff8a8a}
+.copyrow{display:flex;gap:8px;margin-top:8px}
+.copyrow input{flex:1;font-family:var(--font-num);font-size:12px}
+.setup{font-size:13.5px;color:#cfc9dc;line-height:1.65;margin:10px 0 0;padding-left:18px}
 </style>
 <link rel="stylesheet" href="/fx.css">
 </head>
@@ -94,6 +104,29 @@
         <div class="ctlmsg" id="msg">Make sure the vehicle is plugged in before you start.</div>
       </div>
       <div id="notOwner" class="ctlmsg err" style="display:none">Only the station owner can use remote control.</div>
+    </div>
+  </div>
+
+
+  <div id="paySection" style="display:none">
+    <div class="section-title">Pay &amp; Charge (UPI)</div>
+    <p class="hint">Customers open <b id="payUrlTxt">/pay.html</b> (or scan the QR on the charger screen), pay your UPI for an exact amount, and charging starts once the payment is confirmed. It stops by itself when the paid amount is used.</p>
+    <div class="paygrid">
+      <div class="card ctlcard">
+        <div class="lbl">Payments</div>
+        <div id="orders"><div class="hint">No payments yet.</div></div>
+      </div>
+      <div class="card ctlcard">
+        <div class="lbl">Automatic confirmation (free, MacroDroid)</div>
+        <ol class="setup">
+          <li>Install <b>MacroDroid</b> on the phone that gets your PhonePe / GPay / Paytm payment notifications.</li>
+          <li>New macro → Trigger: <b>Notification received</b> → apps: PhonePe, Google Pay, Paytm.</li>
+          <li>Action: <b>HTTP request</b> → POST to the link below, body: the notification title + text.</li>
+        </ol>
+        <div class="copyrow"><input id="notifyUrl" readonly value="loading…"><button class="rowbtn" id="copyNotify">Copy</button></div>
+        <div class="hint" id="lastNotify" style="margin-top:10px">No notification received yet.</div>
+        <div class="hint" style="margin-top:6px">Missed one? Press <b>Payment received</b> next to the order instead.</div>
+      </div>
     </div>
   </div>
 
@@ -185,6 +218,35 @@ function connect(){
 }
 async function poll(){ if (Date.now() - lastMsg < 2500) return; try { render(await api('/live')); } catch (e) {} }
 connect(); poll(); setInterval(poll, 2000);
+
+// ---------- Pay & Charge (owner) ----------
+const ST = {waiting:'Waiting for payment', paid:'Paid · starting', charging:'Charging', done:'Done', expired:'Expired', cancelled:'Cancelled', failed_start:'Paid · did not start'};
+let payArm = 0;
+async function loadPay(){
+  if(!live || !live.isOwner) return;
+  let d; try{ d = await api('/pay/owner'); }catch(e){ return; }
+  $('paySection').style.display = '';
+  $('payUrlTxt').textContent = d.payUrl;
+  if(document.activeElement !== $('notifyUrl')) $('notifyUrl').value = d.notifyUrl;
+  const ln = d.lastNotify;
+  $('lastNotify').textContent = ln ? `Last notification ${Math.round(ln.ageMs/1000)} s ago: ${ln.matched ? 'matched order #' + ln.orderId + ' ✓' : 'no matching order'} — "${ln.text.slice(0,80)}"` : 'No notification received yet.';
+  const rows = d.orders.map(o => `<div class="orow"><div><b>₹${o.payAmount.toFixed(2)}</b> <span class="small">#${o.id}</span><span class="ost ${o.status}">${ST[o.status]||o.status}</span>
+      <div class="small">${new Date(o.createdAt).toLocaleTimeString()}${o.source ? ' · ' + (o.source === 'auto' ? 'auto-confirmed' : 'confirmed by you') : ''}${o.finalBill!=null ? ' · used ₹' + Number(o.finalBill).toFixed(2) : ''}</div></div>
+      <div>${o.status === 'waiting' ? `<button class="rowbtn primary" data-confirm="${o.id}">${payArm === o.id ? 'Tap again' : 'Payment received'}</button><button class="rowbtn" data-cancel="${o.id}">✕</button>` : ''}</div></div>`).join('');
+  $('orders').innerHTML = rows || '<div class="hint">No payments yet.</div>';
+  $('orders').querySelectorAll('[data-confirm]').forEach(b => b.onclick = async () => {
+    const id = Number(b.dataset.confirm);
+    if(payArm !== id){ payArm = id; b.textContent = 'Tap again'; setTimeout(() => { if(payArm === id){ payArm = 0; loadPay(); } }, 4000); return; }
+    payArm = 0;
+    try{ await api('/pay/' + id + '/confirm', {method:'POST'}); }catch(e){ alertMsg(e.message); }
+    loadPay();
+  });
+  $('orders').querySelectorAll('[data-cancel]').forEach(b => b.onclick = async () => { try{ await api('/pay/' + b.dataset.cancel + '/cancel', {method:'POST'}); }catch(e){} loadPay(); });
+}
+function alertMsg(t){ setMsg(t, 'err'); }
+$('copyNotify').onclick = async () => { try{ await navigator.clipboard.writeText($('notifyUrl').value); $('copyNotify').textContent = 'Copied'; }catch(e){ $('notifyUrl').select(); } setTimeout(() => $('copyNotify').textContent = 'Copy', 1500); };
+setInterval(loadPay, 3000); setTimeout(loadPay, 1200);
+
 </script>
 <script src="/fx.js" defer></script>
 </body>

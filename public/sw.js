@@ -1,4 +1,4 @@
-const CACHE_NAME = 'newgenev-shell-v4';
+const CACHE_NAME = 'newgenev-shell-v5';
 const SHELL_FILES = ['/style.css', '/fx.css', '/fx.js', '/app.js', '/control.html', '/icon-192.png'];
 
 self.addEventListener('install', (event) => {
