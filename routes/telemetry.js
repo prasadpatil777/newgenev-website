@@ -480,10 +480,14 @@ router.post('/pay/notify', express.text({ type: '*/*', limit: '8kb' }), async (r
   const text = (typeof req.body === 'string' ? req.body : JSON.stringify(req.body || '')).slice(0, 600);
   lastNotify = { at: Date.now(), text, matched: false, orderId: null };
   const lower = text.toLowerCase();
-  if (!/(received|credited|paid you|sent you|has sent|added to)/.test(lower) || /(you paid|paid to|debited|sent to)/.test(lower)) {
+  // incoming-payment words used by PhonePe/GPay/Paytm and bank SMS (SBI, HDFC, ICICI, Kotak, BOI, ...)
+  if (!/(received|credited|credit of|deposited|paid you|sent you|has sent|added to)/.test(lower) || /(you paid|paid to|debited|sent to)/.test(lower)) {
     return res.json({ ok: true, matched: false, reason: 'not an incoming payment' });
   }
-  const amounts = [...text.replace(/,/g, '').matchAll(/(?:₹|rs\.?|inr)\s*([0-9]+(?:\.[0-9]{1,2})?)/gi)].map(m => Number(m[1]).toFixed(2));
+  const clean = text.replace(/,/g, '');
+  let amounts = [...clean.matchAll(/(?:₹|rs\.?|inr)\s*([0-9]+(?:\.[0-9]{1,2})?)/gi)].map(m => Number(m[1]).toFixed(2));
+  // some banks write the amount without Rs/INR ("credited by 10.03") — fall back to any number with paise
+  if (!amounts.length) amounts = [...clean.matchAll(/(?<![0-9.])([0-9]{1,4}\.[0-9]{2})(?![0-9])/g)].map(m => Number(m[1]).toFixed(2));
   if (!amounts.length) return res.json({ ok: true, matched: false, reason: 'no amount found' });
   await expireOldOrders().catch(() => {});
   const r = await pool.query(
