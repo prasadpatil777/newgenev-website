@@ -20,6 +20,16 @@
 @media(max-width:600px){.mapbox{height:240px}}
 .keytoggle{background:none;border:0;padding:0;color:var(--muted);font:500 13px var(--font-ui);text-decoration:underline;cursor:pointer}
 .keytoggle:hover{color:var(--text)}
+.paycta{display:flex;align-items:center;gap:16px;margin-top:16px;padding:18px 20px;border-radius:18px;text-decoration:none;color:#fff;
+  background:linear-gradient(110deg,rgba(255,122,26,.20),rgba(255,79,163,.14) 50%,rgba(34,211,238,.12));border:1px solid rgba(255,178,63,.45);
+  box-shadow:0 0 34px -10px rgba(255,122,26,.8);transition:transform .2s ease,box-shadow .25s ease}
+.paycta:hover{transform:translateY(-2px);box-shadow:0 0 44px -6px rgba(255,122,26,.95)}
+.paycta-ic{width:48px;height:48px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(140deg,#ffcb6b,#ff7a1a)}
+.paycta-ic svg{width:26px;height:26px;fill:#170900}
+.paycta-tx{flex:1;min-width:0}.paycta-tx b{display:block;font-size:17px;font-family:var(--font-display)}
+.paycta-tx small{display:block;color:#d9d3e6;font-size:13px;margin-top:2px;line-height:1.45}
+.paycta-go{font-weight:800;color:#ffd27a;white-space:nowrap}
+@media(max-width:560px){.paycta-go{display:none}}
 </style>
 <link rel="stylesheet" href="/fx.css">
 </head>
@@ -59,6 +69,12 @@
       </div>
     </div>
   </div>
+
+  <a class="paycta" href="/pay.html">
+    <span class="paycta-ic"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></span>
+    <span class="paycta-tx"><b>Pay &amp; Charge</b><small>Pay with PhonePe, Google Pay or Paytm - charging starts by itself and stops when your amount is used.</small></span>
+    <span class="paycta-go">Pay now →</span>
+  </a>
 
   <div class="emg-banner" id="emgBanner"><span class="emg-dot"></span> EMERGENCY STOP ACTIVE — charging halted</div>
 
