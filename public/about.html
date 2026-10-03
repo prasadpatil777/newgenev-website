@@ -6,53 +6,163 @@
 <title>About - NEW GEN EV</title>
 <link rel="stylesheet" href="/style.css">
 <style>
-.abouthero{
-  margin-top:8px; display:flex; align-items:center; justify-content:center;
-  border-bottom:1px solid var(--line); padding-bottom:12px;
-}
-.abouthero svg{width:100%;max-width:600px;height:auto;display:block}
-.abouttitle{text-align:center;margin-top:40px}
-.abouttitle h1{font-family:var(--font-display);font-size:clamp(28px,3.6vw,38px);font-weight:800;letter-spacing:-.015em;margin:0 0 14px}
-.abouttitle p{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto;line-height:1.6}
+/* ---------- About page (structure: hero → statement → stats → who we serve →
+   mission/vision → how it works → note from the team → team → two CTAs → footer) ---------- */
+.ab-sec{margin-top:84px}
+.ab-kicker{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--amber)}
+.ab-kicker::before{content:"";width:22px;height:2px;border-radius:2px;background:linear-gradient(90deg,#ffb23f,#ff4fa3);box-shadow:0 0 10px rgba(255,122,26,.8)}
+.ab-h2{font-family:var(--font-display);font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-.02em;line-height:1.12;margin:12px 0 12px;text-wrap:balance}
+.ab-lede{color:#a9a3b8;font-size:15.5px;line-height:1.7;max-width:620px;margin:0}
+.grad-text{background:linear-gradient(90deg,#ffcb6b,#ff7a1a 30%,#ff4fa3 60%,#a46bff 85%,#22d3ee);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:ab-flow 7s linear infinite;filter:drop-shadow(0 0 18px rgba(255,122,26,.35))}
+@keyframes ab-flow{to{background-position:250% 0}}
 
-.contactcard{
-  display:flex;align-items:center;gap:18px;background:transparent;
-  padding:28px 0;margin-top:20px;flex-wrap:wrap;border-bottom:1px solid var(--line);
-}
-.contactavatar{
-  width:50px;height:50px;border-radius:50%;background:var(--amber);
-  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#140a00;flex-shrink:0;
-  font-family:var(--font-display);
-}
-.contactinfo b{font-size:16px;font-weight:700}
-.contactinfo .role{color:var(--muted);font-size:13px;margin-top:2px}
-.contactlinks{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
-.contactlinks a{
-  background:transparent;border:1px solid var(--line);color:var(--text);padding:10px 18px;border-radius:999px;
-  text-decoration:none;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px;transition:border-color .15s ease;
-}
-.contactlinks a svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2}
-.contactlinks a:hover{border-color:var(--amber)}
+/* hero */
+.ab-hero{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;padding:56px 0 10px}
+@media(max-width:860px){.ab-hero{grid-template-columns:1fr;padding-top:34px}}
+.ab-hero h1{font-family:var(--font-display);font-size:clamp(38px,6vw,68px);line-height:1.02;letter-spacing:-.03em;font-weight:900;margin:16px 0 20px;text-wrap:balance}
+.ab-hero p{color:#b1abc0;font-size:16.5px;line-height:1.7;max-width:540px;margin:0 0 28px}
+.ab-cta{display:flex;gap:12px;flex-wrap:wrap}
+.ab-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:999px;font-weight:700;font-size:14.5px;text-decoration:none;font-family:var(--font-ui)}
+.ab-btn.primary{position:relative;overflow:hidden;color:#170900;background:linear-gradient(110deg,#ffcb6b,#ff7a1a 35%,#ff4fa3 65%,#ffb23f);background-size:250% 100%;animation:ab-btnflow 5s ease-in-out infinite alternate;box-shadow:0 10px 30px -10px rgba(255,122,26,.85),0 0 24px -4px rgba(255,79,163,.55);transition:transform .15s ease,box-shadow .25s ease}
+.ab-btn.primary:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 16px 40px -10px rgba(255,122,26,.95),0 0 40px -2px rgba(255,79,163,.7)}
+@keyframes ab-btnflow{to{background-position:100% 0}}
+.ab-btn.ghost{border:1px solid rgba(255,255,255,.16);color:#fff;background:rgba(255,255,255,.04)}
+.ab-btn.ghost:hover{border-color:#22d3ee;box-shadow:0 0 22px -4px rgba(34,211,238,.6)}
+.ab-art{position:relative;display:flex;justify-content:center}
+.ab-art svg{width:100%;max-width:440px;height:auto;animation:ab-float 6s ease-in-out infinite}
+@keyframes ab-float{50%{transform:translateY(-12px)}}
+.ab-orbit{position:absolute;inset:6% 10%;border-radius:50%;border:1px dashed rgba(255,178,63,.25);animation:ab-spin 30s linear infinite}
+.ab-orbit::after{content:"";position:absolute;top:-6px;left:50%;width:12px;height:12px;border-radius:50%;background:#ffb23f;box-shadow:0 0 18px 4px rgba(255,178,63,.9)}
+.ab-orbit.o2{inset:18% 22%;border-color:rgba(34,211,238,.25);animation-duration:18s;animation-direction:reverse}
+.ab-orbit.o2::after{background:#22d3ee;box-shadow:0 0 18px 4px rgba(34,211,238,.9)}
+@keyframes ab-spin{to{transform:rotate(360deg)}}
 
-.teamgrid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin-top:16px}
+/* statement band */
+.ab-statement{position:relative;margin-top:70px;padding:64px 28px;text-align:center;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:rgba(10,11,18,.55);backdrop-filter:blur(14px)}
+.ab-statement::before{content:"";position:absolute;left:50%;top:50%;width:620px;height:620px;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(255,122,26,.35),rgba(255,79,163,.18) 40%,rgba(164,107,255,.08) 60%,transparent 70%);filter:blur(10px);animation:ab-breathe 6s ease-in-out infinite;pointer-events:none}
+@keyframes ab-breathe{50%{transform:translate(-50%,-50%) scale(1.12)}}
+.ab-statement h2{position:relative;font-family:var(--font-display);font-size:clamp(26px,4vw,46px);font-weight:900;letter-spacing:-.02em;line-height:1.15;margin:0;text-wrap:balance}
+.ab-statement p{position:relative;color:#b9b3c8;margin:16px auto 0;max-width:560px;line-height:1.7}
+
+/* stats */
+.ab-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+@media(max-width:780px){.ab-stats{grid-template-columns:repeat(2,1fr)}}
+.ab-stat{padding:24px 22px !important}
+.ab-stat .n{font-family:var(--font-num);font-size:34px;font-weight:700;letter-spacing:-.02em;color:#fff;text-shadow:0 0 18px rgba(255,178,63,.55)}
+.ab-stat:nth-child(2) .n{text-shadow:0 0 18px rgba(34,211,238,.6)}
+.ab-stat:nth-child(3) .n{text-shadow:0 0 18px rgba(61,220,132,.6)}
+.ab-stat:nth-child(4) .n{text-shadow:0 0 18px rgba(164,107,255,.65)}
+.ab-stat .l{color:#a9a3b8;font-size:13px;margin-top:6px}
+
+/* who we serve */
+.ab-three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+@media(max-width:900px){.ab-three{grid-template-columns:1fr}}
+.ab-serve{padding:28px 24px !important}
+.ab-ico{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+  background:linear-gradient(140deg,rgba(255,178,63,.22),rgba(255,79,163,.12));border:1px solid rgba(255,178,63,.35);box-shadow:0 0 26px -6px rgba(255,122,26,.7)}
+.ab-serve:nth-child(2) .ab-ico{background:linear-gradient(140deg,rgba(34,211,238,.22),rgba(164,107,255,.12));border-color:rgba(34,211,238,.35);box-shadow:0 0 26px -6px rgba(34,211,238,.7)}
+.ab-serve:nth-child(3) .ab-ico{background:linear-gradient(140deg,rgba(61,220,132,.22),rgba(34,211,238,.12));border-color:rgba(61,220,132,.35);box-shadow:0 0 26px -6px rgba(61,220,132,.7)}
+.ab-ico svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ab-serve h3{font-size:19px;font-weight:800;margin:0 0 8px}
+.ab-serve p{color:#a9a3b8;font-size:14px;line-height:1.65;margin:0 0 16px}
+.ab-serve ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.ab-serve li{display:flex;gap:10px;font-size:13.5px;color:#ddd8e8}
+.ab-serve li::before{content:"";flex-shrink:0;width:7px;height:7px;margin-top:7px;border-radius:50%;background:#ffb23f;box-shadow:0 0 10px #ffb23f}
+.ab-serve:nth-child(2) li::before{background:#22d3ee;box-shadow:0 0 10px #22d3ee}
+.ab-serve:nth-child(3) li::before{background:#3ddc84;box-shadow:0 0 10px #3ddc84}
+
+/* mission / vision */
+.ab-mv{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
+@media(max-width:780px){.ab-mv{grid-template-columns:1fr}}
+.ab-mv .card{padding:34px 30px !important}
+.ab-mv .tag{font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#ffb23f}
+.ab-mv .card:nth-child(2) .tag{color:#22d3ee}
+.ab-mv h3{font-family:var(--font-display);font-size:clamp(21px,2.4vw,27px);font-weight:800;line-height:1.25;margin:12px 0 10px;text-wrap:balance}
+.ab-mv p{color:#a9a3b8;font-size:14.5px;line-height:1.7;margin:0}
+
+/* how it works: flow */
+.ab-flow{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:34px}
+@media(max-width:900px){.ab-flow{grid-template-columns:repeat(2,1fr)}}
+.ab-flow::before{content:"";position:absolute;left:6%;right:6%;top:42px;height:2px;
+  background:linear-gradient(90deg,#ffb23f,#ff4fa3,#a46bff,#22d3ee,#3ddc84);opacity:.6;box-shadow:0 0 14px rgba(255,122,26,.6)}
+.ab-flow::after{content:"";position:absolute;top:37px;left:6%;width:12px;height:12px;border-radius:50%;background:#fff;
+  box-shadow:0 0 16px 5px #ffb23f;animation:ab-run 4s linear infinite}
+@keyframes ab-run{to{left:94%}}
+@media(max-width:900px){.ab-flow::before,.ab-flow::after{display:none}}
+.ab-node{position:relative;text-align:center;padding:0 4px}
+.ab-node .dot{width:84px;height:84px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.14),rgba(14,15,24,.95) 60%);border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 0 0 6px rgba(255,255,255,.02),0 0 30px -6px var(--c,#ffb23f)}
+.ab-node .dot svg{width:32px;height:32px;fill:none;stroke:var(--c,#ffb23f);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px var(--c,#ffb23f))}
+.ab-node b{display:block;font-size:14px}
+.ab-node span{display:block;color:#a9a3b8;font-size:12.5px;line-height:1.5;margin-top:4px}
+
+/* note from the team leader */
+.ab-letter{position:relative;margin-top:30px;padding:44px 40px 36px;border-radius:24px;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,236,205,.07),rgba(255,255,255,.02)),rgba(14,13,20,.7);
+  border:1px solid rgba(255,214,160,.18);backdrop-filter:blur(14px);box-shadow:0 30px 70px -30px rgba(0,0,0,.95)}
+.ab-letter::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(transparent 0 33px,rgba(255,214,160,.06) 33px 34px);pointer-events:none}
+.ab-letter .q{position:absolute;right:28px;top:-6px;font-family:Georgia,serif;font-size:150px;line-height:1;color:rgba(255,178,63,.12)}
+.ab-letter p{position:relative;color:#e6e0d4;font-size:16px;line-height:1.85;max-width:720px;margin:0 0 14px}
+.ab-sign{position:relative;display:flex;align-items:center;gap:14px;margin-top:22px}
+.ab-sign .av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#140a00;
+  background:linear-gradient(140deg,#ffcb6b,#ff7a1a);box-shadow:0 0 24px rgba(255,122,26,.6)}
+.ab-sign b{display:block;font-size:16px}
+.ab-sign span{color:#a9a3b8;font-size:13px}
+.ab-stamp{position:absolute;right:34px;bottom:26px;width:96px;height:96px;border-radius:50%;border:2px dashed rgba(255,178,63,.55);
+  display:flex;align-items:center;justify-content:center;text-align:center;font:800 10.5px/1.25 var(--font-ui);letter-spacing:1px;color:#ffb23f;
+  transform:rotate(-14deg);opacity:.85;box-shadow:inset 0 0 18px rgba(255,178,63,.25)}
+@media(max-width:640px){.ab-letter{padding:34px 22px 120px}.ab-stamp{right:22px;bottom:18px}}
+
+/* team */
+.teamgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
 @media(max-width:780px){.teamgrid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.teamgrid{grid-template-columns:1fr}}
-.teamcard{background:transparent;border-left:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 20px;text-align:center;transition:background .15s ease}
-.teamcard:nth-child(3n+1){border-left:none}
-@media(max-width:780px){.teamcard{border-left:1px solid var(--line)}.teamcard:nth-child(2n+1){border-left:none}}
-@media(max-width:520px){.teamcard{border-left:none}}
-.teamcard:hover{background:var(--panel)}
-.teamavatar{
-  width:50px;height:50px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;
-  font-weight:700;font-size:15px;background:var(--panel);border:1px solid var(--line);color:var(--teal);font-family:var(--font-display);
-}
-.teamcard.leader .teamavatar{background:var(--amber);color:#140a00;border:none}
-.teamname{font-weight:700;font-size:14.5px}
-.teamrole{color:var(--muted);font-size:12px;margin-top:4px}
-.leadertag{
-  display:inline-block;margin-top:10px;font-size:11px;font-weight:600;
-  color:var(--amber);background:rgba(255,178,63,.1);padding:4px 12px;border-radius:999px;
-}
+.teamcard{padding:26px 18px !important;text-align:center}
+.teamavatar{width:60px;height:60px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;
+  font-family:var(--font-display);color:#fff;background:linear-gradient(140deg,rgba(34,211,238,.35),rgba(164,107,255,.35));border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 0 24px -4px rgba(164,107,255,.7)}
+.teamcard.leader .teamavatar{background:linear-gradient(140deg,#ffcb6b,#ff7a1a);color:#140a00;box-shadow:0 0 28px -2px rgba(255,122,26,.9)}
+.teamname{font-weight:800;font-size:15px}
+.teamrole{color:#a9a3b8;font-size:12.5px;margin-top:4px}
+.leadertag{display:inline-block;margin-top:10px;font-size:11px;font-weight:700;color:#ffb23f;background:rgba(255,178,63,.1);border:1px solid rgba(255,178,63,.4);padding:4px 12px;border-radius:999px;box-shadow:0 0 14px -2px rgba(255,178,63,.6)}
+
+/* contact + dual CTA */
+.ab-dual{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
+@media(max-width:860px){.ab-dual{grid-template-columns:1fr}}
+.ab-dual .card{padding:30px 28px !important}
+.ab-dual h3{font-family:var(--font-display);font-size:24px;font-weight:800;margin:10px 0 8px}
+.ab-dual p{color:#a9a3b8;font-size:14.5px;line-height:1.65;margin:0 0 20px}
+.ab-station{margin:0 0 22px;padding:16px;border-radius:16px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1)}
+.ab-station .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ab-station b{font-size:15px}
+.ab-live{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#3ddc84;border:1px solid rgba(61,220,132,.45);padding:3px 10px;border-radius:999px;box-shadow:0 0 14px -2px rgba(61,220,132,.7)}
+.ab-live i{width:7px;height:7px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84;animation:ab-blink 1.4s ease-in-out infinite}
+@keyframes ab-blink{50%{opacity:.3}}
+.ab-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ab-chips span{font-family:var(--font-num);font-size:12px;padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#e9e4f3}
+.ab-code{font-family:var(--font-num);font-size:12.5px;line-height:1.7;color:#ffd9a0;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px 16px;margin:0 0 22px;overflow-x:auto;white-space:pre}
+.ab-code .k{color:#22d3ee}.ab-code .s{color:#3ddc84}.ab-code .c{color:#7d7790}
+
+.contactcard{display:flex;align-items:center;gap:18px;padding:22px 24px !important;margin-top:26px;flex-wrap:wrap}
+.contactavatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(140deg,#ffcb6b,#ff7a1a);display:flex;align-items:center;justify-content:center;font-weight:800;color:#140a00;box-shadow:0 0 22px rgba(255,122,26,.6);flex-shrink:0}
+.contactinfo b{font-size:16px}
+.contactinfo .role{color:#a9a3b8;font-size:13px;margin-top:2px}
+.contactlinks{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
+.contactlinks a{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;text-decoration:none;font-size:13.5px;font-weight:700;color:#fff;
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);transition:box-shadow .2s ease,border-color .2s ease}
+.contactlinks a:hover{border-color:#3ddc84;box-shadow:0 0 20px -4px rgba(61,220,132,.7)}
+.contactlinks a svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+.ab-foot{margin-top:80px;padding:34px 0 40px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:#8f89a0;font-size:13.5px}
+.ab-foot a{color:#d9d4e4;text-decoration:none}
+.ab-foot a:hover{color:#ffb23f}
+.ab-foot .links{display:flex;gap:18px;flex-wrap:wrap}
+
+/* reveal on scroll (starts visible if JS/observer is missing) */
+.rv{transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .8s ease}
+.rv.pre{transform:translateY(26px);opacity:.001}
+@media (prefers-reduced-motion: reduce){.rv,.rv.pre{transform:none;opacity:1;transition:none}.ab-flow::after,.ab-orbit{animation:none}}
 </style>
 <link rel="stylesheet" href="/fx.css">
 </head>
@@ -70,108 +180,205 @@
     <button class="logout" onclick="Auth.logout()">Log out</button>
   </div>
 
-  <div class="abouttitle" style="margin-top:26px">
-    <h1>Powering the next generation of EVs</h1>
-    <p>NEW GEN EV is a real-time, RFID-based smart charging station — built end to end, from the hardware to this dashboard.</p>
-  </div>
+  <!-- 1. Hero -->
+  <section class="ab-hero">
+    <div>
+      <span class="ab-kicker">About NEW GEN EV</span>
+      <h1>We make EV charging <span class="grad-text">smart, simple and honest.</span></h1>
+      <p>NEW GEN EV is a smart RFID charging station built end to end by our student team — the hardware, the firmware and this live dashboard. Tap your card, plug in, and watch every volt, amp and rupee update in real time.</p>
+      <div class="ab-cta">
+        <a class="ab-btn primary" href="/booking.html">Book a charging slot</a>
+        <a class="ab-btn ghost" href="/dashboard.html">See the live dashboard</a>
+      </div>
+    </div>
+    <div class="ab-art" aria-hidden="true">
+      <div class="ab-orbit"></div><div class="ab-orbit o2"></div>
+      <svg viewBox="0 0 400 400">
+        <defs>
+          <radialGradient id="abGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff7a1a" stop-opacity=".45"/><stop offset="100%" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
+          <linearGradient id="abPed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1b2230"/><stop offset="100%" stop-color="#0d1119"/></linearGradient>
+          <linearGradient id="abBolt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffcb6b"/><stop offset="100%" stop-color="#ff4fa3"/></linearGradient>
+        </defs>
+        <circle cx="200" cy="200" r="175" fill="url(#abGlow)"/>
+        <rect x="140" y="80" width="120" height="250" rx="18" fill="url(#abPed)" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+        <rect x="158" y="102" width="84" height="54" rx="8" fill="#08221a" stroke="#1f7a52"/>
+        <text x="200" y="125" text-anchor="middle" fill="#6fffb0" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">CHARGING</text>
+        <text x="200" y="145" text-anchor="middle" fill="#ffd27a" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700">₹12.50</text>
+        <path d="M212,176 L184,228 L202,228 L190,272 L228,214 L208,214 Z" fill="url(#abBolt)" style="filter:drop-shadow(0 0 10px #ff7a1a)"/>
+        <rect x="170" y="290" width="60" height="18" rx="5" fill="#111826" stroke="#22d3ee" stroke-opacity=".6"/>
+        <text x="200" y="303" text-anchor="middle" fill="#9fe8ff" font-family="JetBrains Mono, monospace" font-size="9">RFID ▸ TAP</text>
+        <path d="M140,250 C95,262 80,215 48,238" fill="none" stroke="#3ddc84" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 6px #3ddc84)"/>
+        <circle cx="44" cy="240" r="13" fill="#0f1620" stroke="#3ddc84" stroke-width="2.5"/>
+      </svg>
+    </div>
+  </section>
 
-  <div class="abouthero">
-    <svg viewBox="0 0 640 360" role="img" aria-label="Illustration of an EV charging pedestal">
-      <defs>
-        <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#ffb340" stop-opacity="0.28"/>
-          <stop offset="100%" stop-color="#ffb340" stop-opacity="0"/>
-        </radialGradient>
-        <linearGradient id="pedGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#182029"/>
-          <stop offset="100%" stop-color="#101620"/>
-        </linearGradient>
-      </defs>
-      <g opacity="0.12" stroke="#2a3340" stroke-width="1">
-        <line x1="0" y1="60" x2="640" y2="60"/><line x1="0" y1="120" x2="640" y2="120"/>
-        <line x1="0" y1="180" x2="640" y2="180"/><line x1="0" y1="240" x2="640" y2="240"/>
-        <line x1="0" y1="300" x2="640" y2="300"/>
-        <line x1="80" y1="0" x2="80" y2="360"/><line x1="160" y1="0" x2="160" y2="360"/>
-        <line x1="240" y1="0" x2="240" y2="360"/><line x1="320" y1="0" x2="320" y2="360"/>
-        <line x1="400" y1="0" x2="400" y2="360"/><line x1="480" y1="0" x2="480" y2="360"/>
-        <line x1="560" y1="0" x2="560" y2="360"/>
-      </g>
-      <circle cx="320" cy="190" r="170" fill="url(#glow2)"/>
-      <ellipse cx="320" cy="190" rx="130" ry="55" fill="none" stroke="#2bd9a0" stroke-width="1" stroke-dasharray="4 5" opacity="0.25"/>
-      <ellipse cx="320" cy="190" rx="130" ry="55" fill="none" stroke="#ffb340" stroke-width="1" stroke-dasharray="4 5" opacity="0.2" transform="rotate(60 320 190)"/>
-      <ellipse cx="320" cy="190" rx="130" ry="55" fill="none" stroke="#2bd9a0" stroke-width="1" stroke-dasharray="4 5" opacity="0.2" transform="rotate(120 320 190)"/>
+  <!-- 2. Statement -->
+  <section class="ab-statement rv">
+    <h2>Charging that is <span class="grad-text">live, transparent</span> and made in India.</h2>
+    <p>No guessing, no hidden charges. Our station reads a real energy meter and shows you exactly what you used, while you charge.</p>
+  </section>
 
-      <circle cx="120" cy="90" r="3" fill="#ffb340" opacity="0.55"/>
-      <circle cx="530" cy="110" r="2.4" fill="#2bd9a0" opacity="0.5"/>
-      <circle cx="550" cy="290" r="3" fill="#2bd9a0" opacity="0.4"/>
-      <circle cx="90" cy="280" r="2.4" fill="#ffb340" opacity="0.45"/>
+  <!-- 3. Numbers -->
+  <section class="ab-stats rv">
+    <div class="card ab-stat"><div class="n" data-count="1" data-suffix="s">1s</div><div class="l">Live telemetry refresh</div></div>
+    <div class="card ab-stat"><div class="n" data-count="23" data-prefix="₹">₹23</div><div class="l">Per unit, no markup</div></div>
+    <div class="card ab-stat"><div class="n" data-count="24" data-suffix="/7">24/7</div><div class="l">Emergency monitoring</div></div>
+    <div class="card ab-stat"><div class="n" data-count="6">6</div><div class="l">Builders on the team</div></div>
+  </section>
 
-      <rect x="270" y="110" width="100" height="220" rx="14" fill="url(#pedGrad)" stroke="#232d38" stroke-width="1.5"/>
-      <rect x="285" y="130" width="70" height="46" rx="6" fill="#0d2e14" stroke="#1d5c2e"/>
-      <text x="320" y="159" text-anchor="middle" fill="#6fd98f" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700">READY</text>
-      <path d="M330,195 L308,240 L322,240 L312,275 L342,228 L326,228 Z" fill="#ffb340"/>
-      <circle cx="320" cy="300" r="10" fill="none" stroke="#2bd9a0" stroke-width="2"/>
-      <circle cx="320" cy="300" r="3" fill="#2bd9a0"/>
+  <!-- 4. Who we serve -->
+  <section class="ab-sec">
+    <span class="ab-kicker">Who we serve</span>
+    <h2 class="ab-h2">One station. Three kinds of people.</h2>
+    <p class="ab-lede">From the driver plugging in to the person who owns the charger, everyone sees the same live, honest numbers.</p>
+    <div class="ab-three">
+      <div class="card ab-serve rv">
+        <div class="ab-ico"><svg viewBox="0 0 24 24"><path d="M5 17h14l-1.5-6.5A2 2 0 0 0 15.6 9H8.4a2 2 0 0 0-1.9 1.5Z"/><circle cx="8" cy="17" r="2"/><circle cx="16" cy="17" r="2"/></svg></div>
+        <h3>EV drivers</h3>
+        <p>Charge without the paperwork. Your card is your key, and your phone shows the bill as it grows.</p>
+        <ul><li>Tap RFID card to start</li><li>Live voltage, current and bill</li><li>Book a slot before you arrive</li></ul>
+      </div>
+      <div class="card ab-serve rv">
+        <div class="ab-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 12l3-3 2 2 4-4"/></svg></div>
+        <h3>Station owners</h3>
+        <p>Run a charger like a pro from one dashboard — sessions, bookings, customers and location in one place.</p>
+        <ul><li>Every session logged with units and bill</li><li>Booking alerts and customer list</li><li>Share a link so people book your station</li></ul>
+      </div>
+      <div class="card ab-serve rv">
+        <div class="ab-ico"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M10 21v-6h4v6"/></svg></div>
+        <h3>Campuses & communities</h3>
+        <p>Colleges, housing societies and offices can host a charger anywhere — the map follows the station wherever it goes.</p>
+        <ul><li>Live location on the dashboard</li><li>Fair, first-come slot system</li><li>Emergency stop and safety alerts</li></ul>
+      </div>
+    </div>
+  </section>
 
-      <path d="M270,250 C230,260 210,220 175,235" fill="none" stroke="#2bd9a0" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="270" cy="250" r="4.5" fill="#2bd9a0"/>
-      <circle cx="175" cy="235" r="4.5" fill="#2bd9a0"/>
-      <circle cx="150" cy="238" r="14" fill="#121922" stroke="#2bd9a0" stroke-width="2"/>
-    </svg>
-  </div>
+  <!-- 5. Mission & vision -->
+  <section class="ab-sec">
+    <span class="ab-kicker">Why we exist</span>
+    <div class="ab-mv">
+      <div class="card rv">
+        <div class="tag">Our mission</div>
+        <h3>Make every charge <span class="grad-text">visible and fair.</span></h3>
+        <p>Real meter readings, live on your phone, billed at a clear per-unit price. If you can see it, you can trust it.</p>
+      </div>
+      <div class="card rv">
+        <div class="tag">Our vision</div>
+        <h3>A smart charger in every college, society and street.</h3>
+        <p>Affordable stations that anyone can host, book and monitor — built in India, for the way India moves.</p>
+      </div>
+    </div>
+  </section>
 
-  <div class="section-title">Contact support</div>
-  <div class="contactcard">
-    <div class="contactavatar">PP</div>
-    <div class="contactinfo">
-      <div><b>Prasad Patil</b></div>
-      <div class="role">Charging Station Owner</div>
+  <!-- 6. How it works -->
+  <section class="ab-sec">
+    <span class="ab-kicker">How it works</span>
+    <h2 class="ab-h2">From a card tap to your screen in about a second.</h2>
+    <div class="ab-flow rv">
+      <div class="ab-node" style="--c:#ffb23f"><div class="dot"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h4M7 14h7"/></svg></div><b>RFID card</b><span>Tap to start or stop</span></div>
+      <div class="ab-node" style="--c:#ff7a1a"><div class="dot"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></div><b>Arduino</b><span>Controls relay, LCD, safety</span></div>
+      <div class="ab-node" style="--c:#ff4fa3"><div class="dot"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8v4H8zM8 16h2M14 16h2"/></svg></div><b>Energy meter</b><span>Real V, A, kWh over RS-485</span></div>
+      <div class="ab-node" style="--c:#a46bff"><div class="dot"><svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r="1"/></svg></div><b>ESP32</b><span>Sends data over Wi-Fi</span></div>
+      <div class="ab-node" style="--c:#22d3ee"><div class="dot"><svg viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.5-9A6 6 0 0 1 18 8a4 4 0 0 1-1 10Z"/></svg></div><b>Cloud</b><span>Stores sessions and bookings</span></div>
+      <div class="ab-node" style="--c:#3ddc84"><div class="dot"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div><b>Your screen</b><span>Live bill, timer and map</span></div>
     </div>
-    <div class="contactlinks">
-      <a href="tel:+917410722330"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>+91 74107 22330</a>
-      <a href="https://wa.me/917410722330" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.36 7.56L3 20l1.06-5.44A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 10.5c0 3 2.5 5.5 5.5 5.5"/></svg>WhatsApp</a>
-    </div>
-  </div>
+  </section>
 
-  <div class="section-title">Our team</div>
-  <div class="teamgrid">
-    <div class="teamcard leader">
-      <div class="teamavatar">PP</div>
-      <div class="teamname">Prasad Patil</div>
-      <div class="teamrole">Project Leader</div>
-      <div class="leadertag">Team leader</div>
+  <!-- 7. Note from the team leader -->
+  <section class="ab-sec">
+    <span class="ab-kicker">A note from our team</span>
+    <div class="ab-letter rv">
+      <div class="q">“</div>
+      <p>We started NEW GEN EV with a simple question: why does charging an electric vehicle still feel like a guessing game? You plug in, wait, and only find out what you used at the end.</p>
+      <p>So we built a station that shows everything while it happens — the live reading from a real energy meter, the running bill, and a dashboard you can open from anywhere. Every part of it, from the wiring to the website, was built by our team.</p>
+      <p>This is just the beginning. Thank you for charging with us.</p>
+      <div class="ab-sign">
+        <div class="av">PP</div>
+        <div><b>Prasad Patil</b><span>Project Leader, NEW GEN EV</span></div>
+      </div>
+      <div class="ab-stamp">NEW GEN EV<br>⚡<br>MADE IN<br>INDIA</div>
     </div>
-    <div class="teamcard">
-      <div class="teamavatar">NP</div>
-      <div class="teamname">Niharika Patil</div>
-      <div class="teamrole">Team Member</div>
-    </div>
-    <div class="teamcard">
-      <div class="teamavatar">OA</div>
-      <div class="teamname">Om Alhat</div>
-      <div class="teamrole">Team Member</div>
-    </div>
-    <div class="teamcard">
-      <div class="teamavatar">YT</div>
-      <div class="teamname">Yash Thakare</div>
-      <div class="teamrole">Team Member</div>
-    </div>
-    <div class="teamcard">
-      <div class="teamavatar">AL</div>
-      <div class="teamname">Aaditya Limbalkar</div>
-      <div class="teamrole">Team Member</div>
-    </div>
-    <div class="teamcard">
-      <div class="teamavatar">VK</div>
-      <div class="teamname">Vedant Kambale</div>
-      <div class="teamrole">Team Member</div>
-    </div>
-  </div>
+  </section>
 
-  <div style="height:40px"></div>
+  <!-- 8. Team -->
+  <section class="ab-sec">
+    <span class="ab-kicker">The team</span>
+    <h2 class="ab-h2">The people behind the charger.</h2>
+    <div class="teamgrid">
+      <div class="teamcard leader rv"><div class="teamavatar">PP</div><div class="teamname">Prasad Patil</div><div class="teamrole">Project Leader</div><div class="leadertag">Team leader</div></div>
+      <div class="teamcard rv"><div class="teamavatar">NP</div><div class="teamname">Niharika Patil</div><div class="teamrole">Team Member</div></div>
+      <div class="teamcard rv"><div class="teamavatar">OA</div><div class="teamname">Om Alhat</div><div class="teamrole">Team Member</div></div>
+      <div class="teamcard rv"><div class="teamavatar">YT</div><div class="teamname">Yash Thakare</div><div class="teamrole">Team Member</div></div>
+      <div class="teamcard rv"><div class="teamavatar">AL</div><div class="teamname">Aaditya Limbalkar</div><div class="teamrole">Team Member</div></div>
+      <div class="teamcard rv"><div class="teamavatar">VK</div><div class="teamname">Vedant Kambale</div><div class="teamrole">Team Member</div></div>
+    </div>
+  </section>
+
+  <!-- 9. Two ways in -->
+  <section class="ab-sec">
+    <span class="ab-kicker">Get started</span>
+    <h2 class="ab-h2">Charge with us, or run a station with us.</h2>
+    <div class="ab-dual">
+      <div class="card rv">
+        <span class="ab-kicker">For drivers</span>
+        <h3>Book, tap and charge</h3>
+        <p>Pick a time, tap your RFID card when you arrive, and follow your session live.</p>
+        <div class="ab-station">
+          <div class="top"><b>NEW GEN EV Station</b><span class="ab-live"><i></i>ONLINE</span></div>
+          <div class="ab-chips"><span>AC · 230 V</span><span>16 A socket</span><span>₹23 / unit</span><span>RFID</span></div>
+        </div>
+        <a class="ab-btn primary" href="/booking.html">Book a slot</a>
+      </div>
+      <div class="card rv">
+        <span class="ab-kicker">For station owners</span>
+        <h3>Your charger, online</h3>
+        <p>Connect the station once and every reading streams to your dashboard automatically.</p>
+<div class="ab-code"><span class="c">// what the station sends, every half second</span>
+{ <span class="k">"state"</span>: <span class="s">"CHARGING"</span>, <span class="k">"v"</span>: 229.8,
+  <span class="k">"i"</span>: 4.31, <span class="k">"p"</span>: 975, <span class="k">"sessionWh"</span>: 150 }</div>
+        <a class="ab-btn ghost" href="/dashboard.html">Open dashboard</a>
+      </div>
+    </div>
+
+    <div class="card contactcard rv">
+      <div class="contactavatar">PP</div>
+      <div class="contactinfo"><b>Prasad Patil</b><div class="role">Need help? Talk to the station owner.</div></div>
+      <div class="contactlinks">
+        <a href="tel:+917410722330"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>+91 74107 22330</a>
+        <a href="https://wa.me/917410722330" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.36 7.56L3 20l1.06-5.44A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 10.5c0 3 2.5 5.5 5.5 5.5"/></svg>WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="ab-foot">
+    <div><b style="color:#fff">⚡ NEW GEN EV</b><br>Smart RFID EV charging · Made in India</div>
+    <div class="links">
+      <a href="/dashboard.html">Dashboard</a><a href="/booking.html">Book a slot</a><a href="/goals.html">Goals</a><a href="/contact.html">Talk to an Expert</a><a href="/demo.html">Book a Demo</a>
+    </div>
+  </footer>
 </div>
 <script src="/app.js"></script>
 <script>Auth.requireAuth(); paintUserChip();</script>
+<script>
+// reveal-on-scroll + number count-up (content is visible even if this never runs)
+(function(){
+  var els = document.querySelectorAll('.rv');
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  els.forEach(function(e){ var r = e.getBoundingClientRect(); if (r.top > innerHeight) e.classList.add('pre'); });
+  var io = new IntersectionObserver(function(list){
+    list.forEach(function(en){
+      if (!en.isIntersecting) return;
+      en.target.classList.remove('pre'); io.unobserve(en.target);
+      en.target.querySelectorAll('[data-count]').forEach(function(n){
+        var end = +n.dataset.count, pre = n.dataset.prefix || '', suf = n.dataset.suffix || '', t0 = performance.now();
+        (function step(t){ var k = Math.min(1, (t - t0) / 1200); n.textContent = pre + Math.round(end * (1 - Math.pow(1 - k, 3))) + suf; if (k < 1) requestAnimationFrame(step); })(t0);
+      });
+    });
+  }, { threshold: .15 });
+  els.forEach(function(e){ io.observe(e); });
+})();
+</script>
 <script src="/fx.js" defer></script>
 </body>
 </html>
