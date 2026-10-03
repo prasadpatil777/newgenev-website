@@ -106,6 +106,23 @@ function initAboutLink(){
 }
 initAboutLink();
 
+// Owner-only "Remote control" link (start/stop charging from the website when
+// a customer's RFID card fails). Customers never see it.
+async function initControlLink(){
+  const nav = document.querySelector('.navlinks');
+  if(!nav || !Auth.getToken() || nav.querySelector('a[href="/control.html"]')) return;
+  try{
+    const d = await api('/live');
+    if(!d.isOwner) return;
+    const link = document.createElement('a');
+    link.href = '/control.html';
+    link.textContent = 'Remote control';
+    const chip = document.getElementById('userChip');
+    if(chip) nav.insertBefore(link, chip); else nav.appendChild(link);
+  }catch(e){}
+}
+initControlLink();
+
 // PWA setup: inject the manifest link + theme-color into every page's
 // <head>, and register the service worker, so the site is installable
 // as an app on a phone's home screen. No per-page HTML edits needed.

@@ -13,6 +13,15 @@ const liveLatest = new Map();      // stationId -> { row, receivedAtMs }
 const streamClients = new Set();   // { res, userId }
 const ONLINE_WINDOW_MS = 3000;
 
+// ---------- Remote start/stop (owner backup when a customer's RFID fails) ----------
+// The owner's command waits here; the next telemetry post from the ESP32
+// picks it up in its reply. Commands expire quickly so an old "start" can
+// never fire later by surprise.
+const pendingCmd = new Map();      // stationId -> { id, action, at }
+const lastCmd = new Map();         // stationId -> { id, action, at, status, doneAt }
+const CMD_TTL_MS = 15000;
+let cmdSeq = Math.floor(Date.now() / 1000) % 1000000;
+
 const stationKeyCache = new Map();   // api_key -> { station, at }
 async function stationByApiKey(req, res, next) {
   const key = req.headers['x-station-key'];
@@ -35,11 +44,25 @@ router.post('/telemetry', stationByApiKey, async (req, res) => {
     pf: Number(b.pf) || 0, hz: Number(b.hz) || 0, kwh: Number(b.kwh) || 0,
     session_wh: Number(b.sessionWh) || 0, temp: Number(b.temp) || 0, hum: Number(b.hum) || 0,
     time_sec: Number(b.time) || 0, emergency: b.emg ? 1 : 0,
+    rc: b.rc ? 1 : 0,                 // firmware supports remote start/stop
     received_at: new Date().toISOString()
   };
   liveLatest.set(req.station.id, { row, receivedAtMs: Date.now() });
+
+  // Hand over a waiting remote command (once), unless it is too old.
+  let reply = { ok: true };
+  const p = pendingCmd.get(req.station.id);
+  if (p) {
+    pendingCmd.delete(req.station.id);
+    if (Date.now() - p.at < CMD_TTL_MS) {
+      reply = { ok: true, cmd: p.action, cmdId: p.id };
+      lastCmd.set(req.station.id, { ...p, status: 'delivered', doneAt: Date.now() });
+    } else {
+      lastCmd.set(req.station.id, { ...p, status: 'expired', doneAt: Date.now() });
+    }
+  }
   pushToStreams(req.station.id);      // dashboards update right now
-  res.json({ ok: true });             // ESP32 doesn't wait for the database
+  res.json(reply);                    // ESP32 doesn't wait for the database
 
   try {
     await saveTelemetry(req.station, b);
@@ -118,7 +141,18 @@ function livePayload(station, mem, userId) {
     latest: mem ? mem.row : null,
     ageMs,                      // how old "latest" is - lets the timer stay exact
     location: stationLocation(station),
-    isOwner: station.user_id === userId
+    isOwner: station.user_id === userId,
+    control: controlInfo(station.id, mem)
+  };
+}
+
+function controlInfo(stationId, mem) {
+  let last = lastCmd.get(stationId) || null;
+  const p = pendingCmd.get(stationId);
+  if (p) last = { ...p, status: Date.now() - p.at < CMD_TTL_MS ? 'waiting' : 'expired' };
+  return {
+    supported: !!(mem && mem.row && Number(mem.row.rc) === 1),
+    last: last ? { id: last.id, action: last.action, status: last.status, ageMs: Date.now() - last.at } : null
   };
 }
 
@@ -217,6 +251,30 @@ router.post('/stations/location', requireUser, async (req, res) => {
   mainStationCache = result.rows[0]; mainStationAt = Date.now();
   pushToStreams(station.id);
   res.json({ ok: true, location: stationLocation(result.rows[0]) });
+});
+
+// Owner presses Start / Stop on the website.
+router.post('/stations/control', requireUser, async (req, res) => {
+  const station = await getMainStation();
+  if (!station) return res.status(404).json({ error: 'no station found' });
+  if (station.user_id !== req.userId) return res.status(403).json({ error: 'only the station owner can control the charger' });
+
+  const action = String((req.body || {}).action || '').toLowerCase();
+  if (action !== 'on' && action !== 'off') return res.status(400).json({ error: 'action must be "on" or "off"' });
+
+  const mem = liveLatest.get(station.id);
+  const online = mem && Date.now() - mem.receivedAtMs < ONLINE_WINDOW_MS;
+  if (!online) return res.status(409).json({ error: 'The charger is offline, so it cannot receive the command.' });
+  if (Number(mem.row.rc) !== 1) return res.status(409).json({ error: 'The charger needs the remote-control firmware update first.' });
+  const st = String(mem.row.state || '').toUpperCase();
+  if (mem.row.emergency) return res.status(409).json({ error: 'Emergency stop is active on the charger.' });
+  if (action === 'on' && st !== 'AVAILABLE') return res.status(409).json({ error: `Charger is ${st}; it can only start when AVAILABLE.` });
+  if (action === 'off' && st !== 'CHARGING') return res.status(409).json({ error: `Charger is ${st}; nothing to stop.` });
+
+  const cmd = { id: ++cmdSeq, action, at: Date.now() };
+  pendingCmd.set(station.id, cmd);
+  pushToStreams(station.id);
+  res.json({ ok: true, id: cmd.id });
 });
 
 router.get('/live/history', requireUser, async (req, res) => {

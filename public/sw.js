@@ -1,5 +1,5 @@
-const CACHE_NAME = 'newgenev-shell-v3';
-const SHELL_FILES = ['/style.css', '/fx.css', '/fx.js', '/app.js', '/icon-192.png'];
+const CACHE_NAME = 'newgenev-shell-v4';
+const SHELL_FILES = ['/style.css', '/fx.css', '/fx.js', '/app.js', '/control.html', '/icon-192.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
